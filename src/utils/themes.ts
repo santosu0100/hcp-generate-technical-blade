@@ -13,17 +13,16 @@ export interface ComponentThemeConfig {
 }
 
 // Theme mapping by originator > component
-// Note: 'brand' is not included as it only renders logos, no colors needed
 export const originatorThemes: Record<Originator, Partial<Record<ComponentType, ComponentThemeConfig>>> = {
   hurst: {
-    'highlight-card': { borderColor: '#E2E8F0' },
+    card: { borderColor: '#E2E8F0' },
     'action-button': { primaryColor: '#FFCC00', textPrimary: '#212121' },
     'big-int': { primaryColor: '#FFCC00' },
     section: { titleColor: '#212121' },
     'label-value': { textPrimary: '#4A4A4A', textSecondary: '#212121' },
     link: { primaryColor: '#4338CA' },
     'title-description': { textPrimary: '#4D4D4D', textSecondary: '#71717A' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#FFCC00',
       textPrimary: '#4D4D4D',
       textSecondary: '#71717A',
@@ -34,14 +33,14 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
     'marker-list': { primaryColor: '#FFCC00', textPrimary: '#4D4D4D', textSecondary: '#71717A' },
   },
   borum: {
-    'highlight-card': { borderColor: '#E0E0E0' },
+    card: { borderColor: '#E0E0E0' },
     'action-button': { primaryColor: '#1E3A5F', textPrimary: '#FFFFFF' },
     'big-int': { primaryColor: '#1E3A5F' },
     section: { titleColor: '#1E3A5F' },
     'label-value': { textPrimary: '#212121', textSecondary: '#666666' },
     link: { primaryColor: '#1E3A5F' },
     'title-description': { primaryColor: '#1E3A5F', textPrimary: '#212121', textSecondary: '#666666' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#1E3A5F',
       textPrimary: '#212121',
       textSecondary: '#666666',
@@ -52,14 +51,14 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
     'marker-list': { primaryColor: '#1E3A5F', textPrimary: '#212121', textSecondary: '#666666' },
   },
   ahlex: {
-    'highlight-card': { borderColor: '#C8E6C9' },
+    card: { borderColor: '#C8E6C9' },
     'action-button': { primaryColor: '#2E7D32', textPrimary: '#FFFFFF' },
     'big-int': { primaryColor: '#2E7D32' },
     section: { titleColor: '#2E7D32' },
     'label-value': { textPrimary: '#212121', textSecondary: '#666666' },
     link: { primaryColor: '#2E7D32' },
     'title-description': { primaryColor: '#2E7D32', textPrimary: '#212121', textSecondary: '#666666' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#2E7D32',
       textPrimary: '#212121',
       textSecondary: '#666666',
@@ -70,14 +69,14 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
     'marker-list': { primaryColor: '#2E7D32', textPrimary: '#212121', textSecondary: '#666666' },
   },
   artk: {
-    'highlight-card': { borderColor: '#E1BEE7' },
+    card: { borderColor: '#E1BEE7' },
     'action-button': { primaryColor: '#6A1B9A', textPrimary: '#FFFFFF' },
     'big-int': { primaryColor: '#6A1B9A' },
     section: { titleColor: '#6A1B9A' },
     'label-value': { textPrimary: '#212121', textSecondary: '#666666' },
     link: { primaryColor: '#6A1B9A' },
     'title-description': { primaryColor: '#6A1B9A', textPrimary: '#212121', textSecondary: '#666666' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#6A1B9A',
       textPrimary: '#212121',
       textSecondary: '#666666',
@@ -88,14 +87,14 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
     'marker-list': { primaryColor: '#6A1B9A', textPrimary: '#212121', textSecondary: '#666666' },
   },
   kateto: {
-    'highlight-card': { borderColor: '#FFCCBC' },
+    card: { borderColor: '#FFCCBC' },
     'action-button': { primaryColor: '#D84315', textPrimary: '#FFFFFF' },
     'big-int': { primaryColor: '#D84315' },
     section: { titleColor: '#D84315' },
     'label-value': { textPrimary: '#212121', textSecondary: '#666666' },
     link: { primaryColor: '#D84315' },
     'title-description': { primaryColor: '#D84315', textPrimary: '#212121', textSecondary: '#666666' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#D84315',
       textPrimary: '#212121',
       textSecondary: '#666666',
@@ -106,14 +105,14 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
     'marker-list': { primaryColor: '#D84315', textPrimary: '#212121', textSecondary: '#666666' },
   },
   muv: {
-    'highlight-card': { borderColor: '#B2EBF2' },
+    card: { borderColor: '#B2EBF2' },
     'action-button': { primaryColor: '#00838F', textPrimary: '#FFFFFF' },
     'big-int': { primaryColor: '#00838F' },
     section: { titleColor: '#00838F' },
     'label-value': { textPrimary: '#212121', textSecondary: '#666666' },
     link: { primaryColor: '#00838F' },
     'title-description': { primaryColor: '#00838F', textPrimary: '#212121', textSecondary: '#666666' },
-    'timeline-ordered-description': {
+    'ordered-description': {
       primaryColor: '#00838F',
       textPrimary: '#212121',
       textSecondary: '#666666',
@@ -128,21 +127,6 @@ export const originatorThemes: Record<Originator, Partial<Record<ComponentType, 
 // Check if a string is a valid hex color
 function isHexColor(value: string): boolean {
   return /^#([0-9A-Fa-f]{3}){1,2}$/.test(value);
-}
-
-// Get component theme by originator name
-// Returns undefined if originator not found
-export function getComponentTheme(originator: string, componentType: ComponentType): ComponentThemeConfig | undefined {
-  return originatorThemes[originator.toLowerCase() as Originator]?.[componentType];
-}
-
-// Get theme from hex color
-// Returns undefined if not a valid hex color
-export function getThemeFromHex(colorTheme?: string): ComponentThemeConfig | undefined {
-  if (!colorTheme || !isHexColor(colorTheme)) {
-    return undefined;
-  }
-  return { primaryColor: colorTheme };
 }
 
 // Merge two theme configs (first takes precedence)
@@ -160,11 +144,23 @@ function mergeThemes(primary: ComponentThemeConfig, fallback: ComponentThemeConf
   };
 }
 
+// Get component theme by originator name
+export function getComponentTheme(originator: string, componentType: ComponentType): ComponentThemeConfig | undefined {
+  const normalizedOriginator = originator.toLowerCase() as Originator;
+  const theme = originatorThemes[normalizedOriginator] ?? originatorThemes.hurst;
+  return theme[componentType];
+}
+
+// Get theme from hex color
+export function getThemeFromHex(colorTheme?: string): ComponentThemeConfig | undefined {
+  if (!colorTheme || !isHexColor(colorTheme)) return undefined;
+  return { primaryColor: colorTheme };
+}
+
 // Resolve component theme with fallback chain:
 // 1. Component-specific colors (highest priority)
 // 2. Originator theme for this component
 // 3. Hex color passed as colorTheme
-// 4. Component internal defaults (handled by component itself)
 export function resolveComponentTheme(
   componentType: ComponentType,
   options: {
@@ -175,46 +171,12 @@ export function resolveComponentTheme(
 ): ComponentThemeConfig | undefined {
   const { componentColors, originator, colorTheme } = options;
 
-  // Get originator theme for this component type
   const originatorTheme = originator ? getComponentTheme(originator, componentType) : undefined;
-
-  // Get hex color theme
   const hexTheme = getThemeFromHex(colorTheme);
 
-  // No theme sources available
-  if (!componentColors && !originatorTheme && !hexTheme) {
-    return undefined;
-  }
+  // Early return if no themes available
+  if (!componentColors && !originatorTheme && !hexTheme) return undefined;
 
-  // Only component colors provided
-  if (componentColors && !originatorTheme && !hexTheme) {
-    return componentColors;
-  }
-
-  // Only originator theme provided
-  if (!componentColors && originatorTheme && !hexTheme) {
-    return originatorTheme;
-  }
-
-  // Only hex theme provided
-  if (!componentColors && !originatorTheme && hexTheme) {
-    return hexTheme;
-  }
-
-  // Merge component colors with originator theme
-  if (componentColors && originatorTheme) {
-    return mergeThemes(componentColors, originatorTheme);
-  }
-
-  // Merge component colors with hex theme
-  if (componentColors && hexTheme) {
-    return mergeThemes(componentColors, hexTheme);
-  }
-
-  // Merge originator theme with hex theme (originator takes precedence)
-  if (originatorTheme && hexTheme) {
-    return mergeThemes(originatorTheme, hexTheme);
-  }
-
-  return undefined;
+  // Merge in priority order: componentColors > originatorTheme > hexTheme
+  return mergeThemes(componentColors ?? {}, mergeThemes(originatorTheme ?? {}, hexTheme));
 }

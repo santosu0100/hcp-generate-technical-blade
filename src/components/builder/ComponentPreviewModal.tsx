@@ -23,14 +23,25 @@ export function ComponentPreviewModal({ type, onClose }: Props) {
       case 'arrow-list': return { items: [{title: 'Cenário Base', description: '7.500 vidas cadastradas com 1.000 usuários ativos.'}, {title: 'Projeção', description: 'Expectativa de 15.000 vidas até o fim do exercício.'}] };
       case 'ordered-list': return { items: [{title: 'Crie sua conta', description: 'Cadastre-se na plataforma em 5 minutos.'}, {title: 'Escolha a operação', description: 'Analise as oportunidades disponíveis.'}] };
       case 'marker-list': return { items: [{title: 'Rentabilidade', description: 'Retornos superiores ao CDI.'}, {title: 'Segurança', description: 'Proteção através de fundos.'}] };
-      case 'timeline-ordered-description': return { items: [{title: 'Parceria e Cadastro', description: 'A empresa contrata a plataforma.'}, {title: 'Liquidação', description: 'Pagamento via PIX em segundos.'}] };
+      case 'ordered-description': return { items: [{title: 'Parceria e Cadastro', description: 'A empresa contrata a plataforma.'}, {title: 'Liquidação', description: 'Pagamento via PIX em segundos.'}] };
+      case 'table': return {
+        columns: [
+          { key: 'desc', label: 'Descrição', width: '60%' },
+          { key: 'val', label: 'Valor', width: '40%', align: 'right' }
+        ],
+        items: [
+          { cells: { desc: 'Aporte Inicial', val: 'R$ 10.000,00' } },
+          { cells: { desc: 'Taxa de Estruturação', val: 'R$ 250,00' } },
+          { cells: { desc: 'Total Líquido', val: 'R$ 9.750,00' } }
+        ]
+      };
     }
     return {};
   };
 
   const getDummyChildren = (t: ComponentType) => {
     switch(t) {
-      case 'highlight-card': return [
+      case 'card': return [
          { type: 'label-value', data: { label: 'Aporte', value: 'R$ 10.000,00' } },
          { type: 'big-int', data: { value: '21,00%', label: 'ao ano' }, config: { labelPosition: 'after' } }
       ] as any;
@@ -38,7 +49,7 @@ export function ComponentPreviewModal({ type, onClose }: Props) {
          { type: 'text', data: { content: 'Conteúdo interno da seção demonstrativa para validar o espaçamento, a fonte e a margem entre o título superior e o texto base.' } }
       ] as any;
       case 'sidebar': return [
-         { type: 'highlight-card', children: [
+         { type: 'card', children: [
              { type: 'label-value', data: { label: 'Rentabilidade', value: 'Prefixada' } },
              { type: 'big-int', data: { value: '21,00%', label: 'ao ano' }, config: { labelPosition: 'after' } }
          ]}
@@ -46,6 +57,7 @@ export function ComponentPreviewModal({ type, onClose }: Props) {
       case 'footer': return [
          { type: 'text', data: { content: 'Hurst Capital' } }
       ] as any;
+      case 'table': return [] as any;
     }
     return undefined;
   };

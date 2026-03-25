@@ -13,14 +13,14 @@ interface TimelineItem {
   links?: LinkData[];
 }
 
-interface TimelineOrderedDescriptionTheme {
+interface OrderedDescriptionTheme {
   primaryColor?: string;
   textPrimary?: string;
   textSecondary?: string;
   lineColor?: string;
 }
 
-interface TimelineOrderedDescriptionConfig {
+interface OrderedDescriptionConfig {
   circleColor?: string;
   titleColor?: string;
   descriptionColor?: string;
@@ -28,10 +28,10 @@ interface TimelineOrderedDescriptionConfig {
   linkColor?: string;
 }
 
-interface TimelineOrderedDescriptionProps {
+interface OrderedDescriptionProps {
   items: TimelineItem[];
-  config?: TimelineOrderedDescriptionConfig;
-  theme?: TimelineOrderedDescriptionTheme;
+  config?: OrderedDescriptionConfig;
+  theme?: OrderedDescriptionTheme;
 }
 
 const CIRCLE_SIZE = 12;
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function TimelineOrderedDescription({ items, config, theme }: TimelineOrderedDescriptionProps) {
+export default function OrderedDescription({ items, config, theme }: OrderedDescriptionProps) {
   const circleColor = config?.circleColor ?? theme?.primaryColor ?? '#FFCC00';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';

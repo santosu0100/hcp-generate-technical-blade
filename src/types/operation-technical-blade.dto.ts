@@ -34,29 +34,56 @@ export interface ComponentConfigDTO {
   arrowColor?: string;
   circleColor?: string;
   lineColor?: string;
+  headerBackgroundColor?: string;
+  headerTextColor?: string;
+  headerBold?: boolean;
+  rowBackgroundColor?: string;
+  alternateRowBackgroundColor?: string;
+  enableAlternateRows?: boolean;
 }
 
 export interface BrandDataDTO {}
 export interface LabelValueDataDTO { label: string; value: string; }
 export interface BigIntDataDTO { value: string; label?: string; }
-export interface HighlightCardDataDTO {}
+export interface CardDataDTO {}
 export interface ActionButtonDataDTO { label: string; href: string; }
 export interface SidebarDataDTO {}
 export interface TextDataDTO { content: string; }
 export interface SeparatorDataDTO {}
+
+export interface TableColumnDTO {
+  key: string;
+  label: string;
+  width?: number | string;
+  align?: 'left' | 'right' | 'center';
+  bold?: boolean;
+  italic?: boolean;
+  color?: string;
+}
+
+export interface TableRowDataDTO {
+  cells: Record<string, string | number>;
+}
+
+export interface TableDataDTO {
+  columns: TableColumnDTO[];
+  items: TableRowDataDTO[];
+  groups?: any[];
+}
 
 export interface ComponentDTO {
   type: ComponentType;
   config?: ComponentConfigDTO;
   data?:
     | BrandDataDTO
-    | HighlightCardDataDTO
+    | CardDataDTO
     | ActionButtonDataDTO
     | SidebarDataDTO
     | TextDataDTO
     | SeparatorDataDTO
     | LabelValueDataDTO
     | BigIntDataDTO
+    | TableDataDTO
     | any;
   children?: ComponentDTO[];
 }

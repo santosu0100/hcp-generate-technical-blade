@@ -1,8 +1,7 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { 
-  ComponentType, 
   BrandRenderProps,
-  HighlightCardRenderProps,
+  CardRenderProps,
   LabelValueRenderProps,
   BigIntRenderProps,
   ActionButtonRenderProps,
@@ -12,41 +11,42 @@ import {
   FooterRenderProps,
   LinkRenderProps,
   TitleDescriptionRenderProps,
-  TimelineOrderedDescriptionRenderProps,
+  OrderedDescriptionRenderProps,
   BulletListRenderProps,
   ArrowListRenderProps,
   OrderedListRenderProps,
-  MarkerListRenderProps
+  MarkerListRenderProps,
+  TableRenderProps
 } from '../../../types/pdf-components.types';
 import Brand from '../Brand';
-import HighlightCard from '../HighlightCard';
+import Card from '../Card';
 import ActionButton from '../ActionButton';
 import Sidebar from '../Sidebar';
 import Text from '../Text';
-import Separator from '../Separator';
 import LabelValue from '../LabelValue';
 import BigInt from '../BigInt';
 import Section from '../Section';
 import FooterComponent from '../Footer';
 import Link from '../Link';
 import TitleDescription from '../TitleDescription';
-import TimelineOrderedDescription from '../TimelineOrderedDescription';
-import BulletList, { BulletListVariant } from '../BulletList';
+import OrderedDescription from '../OrderedDescription';
+import BulletList from '../BulletList';
 import ArrowList from '../ArrowList';
 import OrderedList from '../OrderedList';
 import MarkerList from '../MarkerList';
+import Table from '../Table';
 
 // Render functions for each component - this is the source of truth
-export const componentRenderers: Record<ComponentType, (props: any) => ReactElement | null> = {
+export const componentRenderers = {
   brand: ({ config }: BrandRenderProps) => (
     <Brand originator={config?.originator} alignment={config?.alignment} />
   ),
 
-  'highlight-card': ({
+  card: ({
     children,
     renderChild,
     theme,
-  }: HighlightCardRenderProps) => <HighlightCard theme={theme}>{children?.map(child => renderChild(child))}</HighlightCard>,
+  }: CardRenderProps) => <Card theme={theme}>{children?.map(child => renderChild(child))}</Card>,
 
   'label-value': ({
     data,
@@ -134,11 +134,11 @@ export const componentRenderers: Record<ComponentType, (props: any) => ReactElem
     />
   ),
 
-  'timeline-ordered-description': ({
+  'ordered-description': ({
     data,
     config,
     theme,
-  }: TimelineOrderedDescriptionRenderProps) => <TimelineOrderedDescription items={data?.items ?? []} config={config} theme={theme} />,
+  }: OrderedDescriptionRenderProps) => <OrderedDescription items={data?.items ?? []} config={config} theme={theme} />,
 
   'bullet-list': ({
     data,
@@ -163,4 +163,15 @@ export const componentRenderers: Record<ComponentType, (props: any) => ReactElem
     config,
     theme,
   }: MarkerListRenderProps) => <MarkerList items={data?.items ?? []} config={config} theme={theme} />,
-};
+
+  table: ({ data, config, theme }: TableRenderProps) => (
+    <Table
+      columns={data?.columns ?? []}
+      items={data?.items ?? []}
+      groups={data?.groups}
+      config={config}
+      theme={theme}
+      variant={config?.variant}
+    />
+  ),
+} as const;

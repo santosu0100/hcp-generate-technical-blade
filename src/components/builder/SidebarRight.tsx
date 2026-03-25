@@ -1,335 +1,200 @@
-// @ts-nocheck
-import React from 'react';
+import React, { useState } from 'react';
 import { usePdfBuilder } from '../../context/PdfBuilderContext';
-import { Trash2, Plus } from 'lucide-react';
-import { ColorInput } from './ColorInput';
+import { 
+  Trash2, Settings, FileText, Type, List, 
+  Image as ImageIcon, Footprints, Columns, 
+  Table as TableIcon, Edit3, AlignLeft, 
+  AlignCenter, AlignRight, AlignJustify,
+  Layout
+} from 'lucide-react';
+import { TableEditorModal } from './TableEditorModal';
 
 export function SidebarRight() {
-  const { components, selectedComponentId, updateComponent, originator, setOriginator } = usePdfBuilder();
-  const selected = components.find(c => c.id === selectedComponentId);
+  const { rootComponents, selectedComponentId, updateComponent, originator, setOriginator } = usePdfBuilder();
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
 
-  const inputClass = "w-full bg-black/20 border border-white/10 text-slate-100 px-3 py-2 rounded text-sm outline-none transition-colors focus:border-blue-500";
-  const labelClass = "text-xs font-medium text-slate-400";
-  const groupClass = "flex flex-col gap-1.5 mb-3";
-
-  const dto = selected?.dto;
-
-  const updateData = (key: string, value: any) => {
-    updateComponent(selected.id, { data: { ...(dto.data || {}), [key]: value } });
-  };
-  
-  const updateConfig = (key: string, value: any) => {
-    updateComponent(selected.id, { config: { ...(dto.config || {}), [key]: value } });
+  // Encontrar o componente atual na árvore
+  const findComponent = (nodes: any[], id: string): any => {
+    for (const node of nodes) {
+      if (node.id === id) return node;
+      if (node._childrenWrapped) {
+        const found = findComponent(node._childrenWrapped, id);
+        if (found) return found;
+      }
+    }
+    return null;
   };
 
-  const updateArrayItem = (arrayKey: string, index: number, field: string, value: any) => {
-    const arr = [...(dto.data?.[arrayKey] || [])];
-    arr[index] = { ...arr[index], [field]: value };
-    updateData(arrayKey, arr);
+  const component = selectedComponentId ? findComponent(rootComponents, selectedComponentId) : null;
+
+  const updateData = (newData: any) => {
+    if (!component) return;
+    updateComponent(component.id, { data: { ...(component.dto.data || {}), ...newData } });
   };
 
-  const addArrayItem = (arrayKey: string, defaultItem: any) => {
-    const arr = [...(dto.data?.[arrayKey] || []), defaultItem];
-    updateData(arrayKey, arr);
+  const updateConfig = (newConfig: any) => {
+    if (!component) return;
+    updateComponent(component.id, { config: { ...(component.dto.config || {}), ...newConfig } });
   };
 
-  const removeArrayItem = (arrayKey: string, index: number) => {
-    const arr = [...(dto.data?.[arrayKey] || [])];
-    arr.splice(index, 1);
-    updateData(arrayKey, arr);
-  };
+  if (!component) {
+    return (
+      <div className="h-full flex flex-col items-center justify-center text-slate-500 p-8 text-center bg-slate-900/40">
+        <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mb-4 border border-white/5">
+          <Settings size={32} className="opacity-20" />
+        </div>
+        <p className="text-sm font-medium">Selecione um componente para editar suas propriedades.</p>
+      </div>
+    );
+  }
+
+  const { dto } = component;
+  const { type, data = {}, config = {} } = dto;
+
+  const renderField = (label: string, value: string, onChange: (val: string) => void, fieldType: string = 'text') => (
+    <div className="mb-4">
+      <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">{label}</label>
+      <input 
+        type={fieldType}
+        value={value || ''} 
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500 focus:bg-white/10 transition-all shadow-inner"
+      />
+    </div>
+  );
+
+  const renderSection = (title: string, icon: React.ReactNode, children: React.ReactNode) => (
+    <div className="mb-8 last:mb-0">
+      <div className="flex items-center gap-2 mb-4 border-b border-white/5 pb-2">
+        <div className="text-blue-500">{icon}</div>
+        <h3 className="text-[11px] font-bold text-slate-100 uppercase tracking-[0.2em]">{title}</h3>
+      </div>
+      <div className="px-1">{children}</div>
+    </div>
+  );
 
   return (
-    <div className="w-full flex flex-col text-slate-200 h-full">
-      <div className="flex flex-col gap-4 mb-4 pb-4 border-b border-white/10 shrink-0">
-        <h3 className="text-base font-semibold text-slate-100 text-left">Propriedades Globais</h3>
-        <div className="flex flex-col gap-2 text-left">
-          <label className={labelClass}>Originator:</label>
-          <select className={inputClass} value={originator} onChange={e => setOriginator(e.target.value as any)}>
-            <option value="hurst">hurst</option>
-            <option value="borum">borum</option>
-            <option value="ahlex">ahlex</option>
-            <option value="artk">artk</option>
-            <option value="kateto">kateto</option>
-            <option value="muv">muv</option>
-          </select>
+    <div className="animate-in fade-in slide-in-from-right-2 duration-300">
+      {/* Component Header Identity */}
+      <div className="flex items-center gap-3 mb-8 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl">
+        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-lg shrink-0">
+           {type === 'text' && <Type size={20}/>}
+           {type === 'section' && <Layout size={20}/>}
+           {type === 'card' && <FileText size={20}/>}
+           {type === 'sidebar' && <Columns size={20}/>}
+           {type === 'footer' && <Footprints size={20}/>}
+           {type === 'brand' && <ImageIcon size={20}/>}
+           {type === 'table' && <TableIcon size={20}/>}
+           {!['text', 'section', 'card', 'sidebar', 'footer', 'brand', 'table'].includes(type) && <Settings size={20}/>}
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-white uppercase tracking-tight truncate">{type}</h2>
+          <p className="text-[10px] text-slate-400 font-mono truncate">{component.id}</p>
         </div>
       </div>
 
-      {!selected ? (
-        <p className="text-xs opacity-70 mt-4 italic text-center text-slate-400">Selecione um componente no Canvas para editar suas propriedades específicas.</p>
-      ) : (
-        <div className="flex-1 overflow-y-auto pr-2 pb-6 mr-[-8px]">
-          <h3 className="text-base font-semibold text-slate-100 mb-4 pb-2 border-b border-white/10">Propriedades - <span className="text-blue-400">{dto.type}</span></h3>
+      {/* Originator Sync (Only on Root Components or Global) */}
+      {renderSection('Originadora (Tema)', <ImageIcon size={14}/>, (
+        <select 
+          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500"
+          value={originator} 
+          onChange={e => setOriginator(e.target.value as any)}
+        >
+          <option value="hurst" className="bg-slate-800">Hurst</option>
+          <option value="borum" className="bg-slate-800">Borum</option>
+          <option value="ahlex" className="bg-slate-800">Ahlex</option>
+          <option value="artk" className="bg-slate-800">ArtK</option>
+          <option value="kateto" className="bg-slate-800">Kateto</option>
+          <option value="muv" className="bg-slate-800">Muv</option>
+        </select>
+      ))}
 
-          <div className="mb-6">
-            <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Data</h4>
-            
-            {['text'].includes(dto.type) && (
-               <div className={groupClass}>
-                <label className={labelClass}>Content</label>
-                <textarea className={inputClass} value={dto.data?.content || ''} onChange={e => updateData('content', e.target.value)} rows={4} />
-               </div>
-            )}
-            
-            {['section', 'title-description'].includes(dto.type) && (
-               <div className={groupClass}>
-                <label className={labelClass}>Title</label>
-                <input type="text" className={inputClass} value={dto.data?.title || ''} onChange={e => updateData('title', e.target.value)} />
-               </div>
-            )}
+      {/* Specific Component Data Fields */}
+      {type === 'text' && renderSection('Conteúdo', <FileText size={14}/>, (
+        <textarea 
+          value={data.content || ''} 
+          onChange={(e) => updateData({ content: e.target.value })}
+          rows={6}
+          className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500 focus:bg-white/10 transition-all shadow-inner resize-none"
+        />
+      ))}
 
-            {['title-description'].includes(dto.type) && (
-               <div className={groupClass}>
-                <label className={labelClass}>Description</label>
-                <textarea className={inputClass} value={dto.data?.description || ''} onChange={e => updateData('description', e.target.value)} rows={4} />
-               </div>
-            )}
-            
-            {dto.type === 'label-value' && (
-               <>
-                 <div className={groupClass}>
-                  <label className={labelClass}>Label</label>
-                  <input type="text" className={inputClass} value={dto.data?.label || ''} onChange={e => updateData('label', e.target.value)} />
-                 </div>
-                 <div className={groupClass}>
-                  <label className={labelClass}>Value</label>
-                  <input type="text" className={inputClass} value={dto.data?.value || ''} onChange={e => updateData('value', e.target.value)} />
-                 </div>
-               </>
-            )}
-            
-            {dto.type === 'big-int' && (
-               <>
-                 <div className={groupClass}>
-                  <label className={labelClass}>Value</label>
-                  <input type="text" className={inputClass} value={dto.data?.value || ''} onChange={e => updateData('value', e.target.value)} />
-                 </div>
-                 <div className={groupClass}>
-                  <label className={labelClass}>Label</label>
-                  <input type="text" className={inputClass} value={dto.data?.label || ''} onChange={e => updateData('label', e.target.value)} />
-                 </div>
-               </>
-            )}
+      {type === 'section' && renderSection('Configurações', <Settings size={14}/>, 
+        renderField('Título da Seção', data.title, (val) => updateData({ title: val }))
+      )}
 
-            {['link', 'action-button'].includes(dto.type) && (
-               <>
-                 <div className={groupClass}>
-                  <label className={labelClass}>Label</label>
-                  <input type="text" className={inputClass} value={dto.data?.label || ''} onChange={e => updateData('label', e.target.value)} />
-                 </div>
-                 <div className={groupClass}>
-                  <label className={labelClass}>URL (href)</label>
-                  <input type="text" className={inputClass} value={dto.data?.href || ''} onChange={e => updateData('href', e.target.value)} />
-                 </div>
-               </>
-            )}
+      {/* TABLE EDITOR TRIGGER */}
+      {type === 'table' && (
+        <div className="mb-8">
+          <button 
+            onClick={() => setIsTableModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/20 active:scale-95"
+          >
+            <Edit3 size={18} /> 🛠️ Abrir Editor de Tabela
+          </button>
+          <p className="text-[10px] text-slate-500 mt-2 text-center italic leading-relaxed">
+            Utilize o editor em tela cheia para gerenciar colunas, linhas e alinhar dados complexos.
+          </p>
+        </div>
+      )}
 
-            {/* Nested Links inside Title-Description */}
-            {['title-description'].includes(dto.type) && (
-              <div className={groupClass}>
-                <label className="text-xs font-medium text-slate-400 mb-2 block">Links Extras</label>
-                {(dto.data?.links || []).map((link: any, idx: number) => (
-                  <div key={idx} className="p-2 bg-white/5 rounded relative mb-2 flex flex-col gap-1 border border-white/5">
-                    <input type="text" placeholder="Label" className={inputClass} value={link.label || ''} onChange={(e) => updateArrayItem('links', idx, 'label', e.target.value)} />
-                    <input type="text" placeholder="Href" className={inputClass} value={link.href || ''} onChange={(e) => updateArrayItem('links', idx, 'href', e.target.value)} />
-                    <button onClick={() => removeArrayItem('links', idx)} className="absolute top-2 right-2 text-red-400 hover:text-red-300 transition-colors"><Trash2 size={12}/></button>
-                  </div>
-                ))}
-                <button 
-                  className="w-full bg-white/5 border border-dashed border-white/20 text-slate-300 px-3 py-2 rounded text-xs font-medium hover:bg-white/10 hover:border-white/40 transition-all flex items-center justify-center gap-2 mt-1" 
-                  onClick={() => addArrayItem('links', { label: '', href: '' })}
-                >
-                  <Plus size={14}/> Adicionar Link
-                </button>
-              </div>
-            )}
-
-            {/* Arrays for List Components */}
-            {['bullet-list', 'arrow-list', 'ordered-list', 'marker-list', 'timeline-ordered-description'].includes(dto.type) && (
-              <div className={groupClass}>
-                <label className="text-xs font-medium text-slate-400 mb-2 block">Itens da Lista</label>
-                {(dto.data?.items || []).map((item: any, idx: number) => (
-                  <div key={idx} className="p-3 bg-white/5 rounded relative mb-3 flex flex-col gap-2 border border-white/5">
-                    {dto.type === 'bullet-list' ? (
-                      <>
-                        <input type="text" placeholder="Label" className={inputClass} value={item.label || ''} onChange={(e) => updateArrayItem('items', idx, 'label', e.target.value)} />
-                        <input type="text" placeholder="Value" className={inputClass} value={item.value || ''} onChange={(e) => updateArrayItem('items', idx, 'value', e.target.value)} />
-                      </>
-                    ) : (
-                      <>
-                        <input type="text" placeholder="Título" className={inputClass} value={item.title || ''} onChange={(e) => updateArrayItem('items', idx, 'title', e.target.value)} />
-                        <textarea placeholder="Descrição" className={inputClass} value={item.description || ''} onChange={(e) => updateArrayItem('items', idx, 'description', e.target.value)} rows={2} />
-                      </>
-                    )}
-                    <button onClick={() => removeArrayItem('items', idx)} className="absolute top-3 right-3 text-red-400 hover:text-red-300 transition-colors"><Trash2 size={14}/></button>
-                  </div>
-                ))}
-                <button 
-                  className="w-full bg-white/5 border border-dashed border-white/20 text-slate-300 px-3 py-2 rounded text-xs font-medium hover:bg-white/10 hover:border-white/40 transition-all flex items-center justify-center gap-2 mt-1" 
-                  onClick={() => addArrayItem('items', dto.type === 'bullet-list' ? { label: '', value: '' } : { title: '', description: '' })}
-                >
-                  <Plus size={14}/> Adicionar Item
-                </button>
-              </div>
-            )}
-
-          </div>
-
-          <div className="mb-6">
-            <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">Configurações de Estilo</h4>
-            
-            {['text', 'section'].includes(dto.type) && (
-              <div className={groupClass}>
-                <label className={labelClass}>Align</label>
-                <select className={inputClass} value={dto.config?.align || ''} onChange={e => updateConfig('align', e.target.value)}>
-                  <option value="">Default</option>
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                  <option value="justify">Justify</option>
-                </select>
-              </div>
-            )}
-
-            {dto.type === 'text' && (
-              <>
-                <div className={groupClass}>
-                  <label className={labelClass}>Font Size</label>
-                  <input type="number" className={inputClass} value={dto.config?.fontSize || ''} onChange={e => updateConfig('fontSize', Number(e.target.value) || undefined)} />
-                </div>
-                <div className={groupClass}>
-                  <label className={labelClass}>Font Weight</label>
-                  <select className={inputClass} value={dto.config?.fontWeight || ''} onChange={e => updateConfig('fontWeight', e.target.value)}>
-                    <option value="">Normal</option>
-                    <option value="bold">Bold</option>
-                  </select>
-                </div>
-                <ColorInput 
-                  label="Color" 
-                  value={dto.config?.color || ''} 
-                  onChange={val => updateConfig('color', val)} 
-                  labelClass={labelClass}
-                />
-              </>
-            )}
-
-            {dto.type === 'brand' && (
-              <div className={groupClass}>
-                <label className={labelClass}>Alignment</label>
-                <select className={inputClass} value={dto.config?.alignment || ''} onChange={e => updateConfig('alignment', e.target.value)}>
-                  <option value="">Default</option>
-                  <option value="left">Left</option>
-                  <option value="center">Center</option>
-                  <option value="right">Right</option>
-                </select>
-              </div>
-            )}
-
-            {dto.type === 'big-int' && (
-              <div className={groupClass}>
-                <label className={labelClass}>Label Position</label>
-                <select className={inputClass} value={dto.config?.labelPosition || ''} onChange={e => updateConfig('labelPosition', e.target.value)}>
-                  <option value="">Default</option>
-                  <option value="before">Before</option>
-                  <option value="after">After</option>
-                </select>
-              </div>
-            )}
-
-            {dto.type === 'sidebar' && (
-              <div className={groupClass}>
-                <label className={labelClass}>Position</label>
-                <select className={inputClass} value={dto.config?.position || ''} onChange={e => updateConfig('position', e.target.value)}>
-                  <option value="">Default (Left)</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                </select>
-              </div>
-            )}
-            
-            {dto.type === 'sidebar' && (
-              <div className={groupClass}>
-                <label className={labelClass}>Width (%)</label>
-                <input type="number" className={inputClass} value={dto.config?.width || ''} onChange={e => updateConfig('width', Number(e.target.value) || undefined)} />
-              </div>
-            )}
-
-            {['label-value', 'bullet-list'].includes(dto.type) && (
-              <div className={groupClass}>
-                <label className={labelClass}>Variant</label>
-                <select className={inputClass} value={dto.config?.variant || ''} onChange={e => updateConfig('variant', e.target.value)}>
-                  <option value="">Default</option>
-                  <option value="bolder-value">Bolder Value</option>
-                  <option value="bolder-label">Bolder Label</option>
-                  <option value="bolder-both">Bolder Both</option>
-                </select>
-              </div>
-            )}
-
-            {/* Global Color Options for Many Components */}
-            {['title-description', 'timeline-ordered-description', 'arrow-list', 'ordered-list', 'marker-list', 'section'].includes(dto.type) && (
-                <ColorInput 
-                  label="Title Color" 
-                  value={dto.config?.titleColor || ''} 
-                  onChange={val => updateConfig('titleColor', val)} 
-                  labelClass={labelClass}
-                />
-            )}
-            
-            {['title-description', 'timeline-ordered-description', 'arrow-list', 'ordered-list', 'marker-list'].includes(dto.type) && (
-                <ColorInput 
-                  label="Description Color" 
-                  value={dto.config?.descriptionColor || ''} 
-                  onChange={val => updateConfig('descriptionColor', val)} 
-                  labelClass={labelClass}
-                />
-            )}
-
-            {['title-description', 'timeline-ordered-description', 'link'].includes(dto.type) && (
-                <ColorInput 
-                  label="Link Color" 
-                  value={dto.config?.linkColor || dto.config?.color || ''} 
-                  onChange={val => updateConfig(dto.type === 'link' ? 'color' : 'linkColor', val)} 
-                  labelClass={labelClass}
-                />
-            )}
-
-            {dto.type === 'bullet-list' && (
-              <>
-                <ColorInput label="Bullet Color" value={dto.config?.bulletColor || ''} onChange={val => updateConfig('bulletColor', val)} labelClass={labelClass} className="mb-2" />
-                <ColorInput label="Label Color" value={dto.config?.labelColor || ''} onChange={val => updateConfig('labelColor', val)} labelClass={labelClass} className="mb-2" />
-                <ColorInput label="Value Color" value={dto.config?.valueColor || ''} onChange={val => updateConfig('valueColor', val)} labelClass={labelClass} className="mb-2" />
-              </>
-            )}
-            
-            {dto.type === 'ordered-list' && (
-              <>
-                <ColorInput label="Number Color" value={dto.config?.numberColor || ''} onChange={val => updateConfig('numberColor', val)} labelClass={labelClass} className="mb-2" />
-                <ColorInput label="Number BG Color" value={dto.config?.numberBackgroundColor || ''} onChange={val => updateConfig('numberBackgroundColor', val)} labelClass={labelClass} className="mb-2" />
-              </>
-            )}
-
-            {dto.type === 'marker-list' && (
-              <>
-                <ColorInput label="Marker Color" value={dto.config?.markerColor || ''} onChange={val => updateConfig('markerColor', val)} labelClass={labelClass} className="mb-2" />
-                <div className={groupClass}><label className={labelClass}>Marker Size</label><input type="number" className={inputClass} value={dto.config?.markerSize || ''} onChange={e => updateConfig('markerSize', Number(e.target.value) || undefined)} /></div>
-              </>
-            )}
-            
-            {dto.type === 'arrow-list' && (
-              <ColorInput label="Arrow Color" value={dto.config?.arrowColor || ''} onChange={val => updateConfig('arrowColor', val)} labelClass={labelClass} />
-            )}
-            
-            {dto.type === 'timeline-ordered-description' && (
-              <>
-                <ColorInput label="Circle Color" value={dto.config?.circleColor || ''} onChange={val => updateConfig('circleColor', val)} labelClass={labelClass} className="mb-2" />
-                <ColorInput label="Line Color" value={dto.config?.lineColor || ''} onChange={val => updateConfig('lineColor', val)} labelClass={labelClass} className="mb-2" />
-              </>
-            )}
-
+      {/* Layout Specific Configs */}
+      {type === 'sidebar' && renderSection('Layout', <Columns size={14}/>, (
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <button 
+              onClick={() => updateConfig({ position: 'left' })}
+              className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.position !== 'right' ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+            >
+              ESQUERDA
+            </button>
+            <button 
+              onClick={() => updateConfig({ position: 'right' })}
+              className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.position === 'right' ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+            >
+              DIREITA
+            </button>
           </div>
         </div>
+      ))}
+
+      {/* Global Appearance (Alignment) */}
+      {['text', 'section', 'brand'].includes(type) && renderSection('Alinhamento', <AlignLeft size={14}/>, (
+        <div className="flex gap-1.5 p-1 bg-white/5 rounded-lg border border-white/5">
+           {[
+             { val: 'left', icon: <AlignLeft size={16}/> },
+             { val: 'center', icon: <AlignCenter size={16}/> },
+             { val: 'right', icon: <AlignRight size={16}/> },
+             { val: 'justify', icon: <AlignJustify size={16}/> }
+           ].map(a => (
+             <button 
+                key={a.val}
+                onClick={() => updateConfig({ align: a.val })}
+                className={`flex-1 flex items-center justify-center py-2 rounded-md transition-all ${config.align === a.val ? 'bg-blue-500 text-white shadow-lg' : 'text-slate-500 hover:bg-white/5 hover:text-slate-300'}`}
+             >
+                {a.icon}
+             </button>
+           ))}
+        </div>
+      ))}
+
+      {/* Generic Props / Actions */}
+      <div className="mt-12 pt-6 border-t border-white/10">
+        <button 
+          className="w-full flex items-center justify-center gap-2 py-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-xl text-xs font-bold hover:bg-red-500/20 transition-all group"
+          title="Remover este componente"
+        >
+          <Trash2 size={16} className="group-hover:animate-bounce" />
+          EXCLUIR COMPONENTE
+        </button>
+      </div>
+
+      {/* Modal for Table */}
+      {isTableModalOpen && (
+        <TableEditorModal 
+          componentId={component.id} 
+          onClose={() => setIsTableModalOpen(false)} 
+        />
       )}
     </div>
   );

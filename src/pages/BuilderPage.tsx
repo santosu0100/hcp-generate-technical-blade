@@ -41,15 +41,8 @@ export function BuilderPage() {
     reader.readAsText(file);
   };
   
-  const handlePasteJson = () => {
-    const json = prompt('Cole o JSON do payload aqui:');
-    if (!json) return;
-    try {
-      const data = JSON.parse(json);
-      loadPayload(data);
-    } catch (err) {
-      alert('JSON inválido');
-    }
+  const handlePasteJson = (data: any) => {
+    loadPayload(data);
   };
 
   const handleDownloadPdf = async () => {

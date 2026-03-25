@@ -19,7 +19,7 @@ export type ComponentCategory = typeof ComponentCategory[keyof typeof ComponentC
 
 export type ComponentType = 
   | 'brand' 
-  | 'highlight-card' 
+  | 'card' 
   | 'label-value' 
   | 'big-int' 
   | 'action-button' 
@@ -31,11 +31,12 @@ export type ComponentType =
   | 'footer' 
   | 'link' 
   | 'title-description' 
-  | 'timeline-ordered-description' 
+  | 'ordered-description' 
   | 'bullet-list' 
   | 'arrow-list' 
   | 'ordered-list' 
-  | 'marker-list';
+  | 'marker-list'
+  | 'table';
 
 export interface ComponentDTO {
   type: ComponentType;
@@ -51,7 +52,7 @@ export interface BrandRenderProps {
   config?: { originator?: string; alignment?: 'left' | 'right' | 'center' };
 }
 
-export interface HighlightCardRenderProps {
+export interface CardRenderProps {
   children?: ComponentDTO[];
   renderChild: RenderChildFn;
   theme?: ComponentTheme;
@@ -91,10 +92,6 @@ export interface TextRenderProps {
   theme?: ComponentTheme;
 }
 
-export interface SeparatorRenderProps {
-  config?: { spacing?: number };
-}
-
 export interface SectionRenderProps {
   data?: { title: string };
   config?: { titleColor?: string };
@@ -120,7 +117,7 @@ export interface TitleDescriptionRenderProps {
   theme?: ComponentTheme;
 }
 
-export interface TimelineOrderedDescriptionRenderProps {
+export interface OrderedDescriptionRenderProps {
   data?: {
     items: {
       title: string;
@@ -198,5 +195,69 @@ export interface MarkerListRenderProps {
     titleColor?: string;
     descriptionColor?: string;
   };
+  theme?: ComponentTheme;
+}
+
+export interface TableColumnConfig {
+  key: string;
+  label: string;
+  width?: number | string;
+  bold?: boolean;
+  italic?: boolean;
+  color?: string;
+  align?: 'left' | 'right' | 'center';
+  backgroundColor?: string;
+  textColor?: string;
+}
+
+export interface TableRowData {
+  cells: Record<string, string | number>;
+  style?: {
+    backgroundColor?: string;
+    textColor?: string;
+    bold?: boolean;
+    italic?: boolean;
+  };
+}
+
+export interface TableConfig {
+  variant?: string;
+  headerBackgroundColor?: string;
+  headerTextColor?: string;
+  headerBold?: boolean;
+  headerItalic?: boolean;
+  groupHeaderBackgroundColor?: string;
+  groupHeaderTextColor?: string;
+  groupHeaderBold?: boolean;
+  groupHeaderItalic?: boolean;
+  rowBackgroundColor?: string;
+  rowTextColor?: string;
+  rowBold?: boolean;
+  rowItalic?: boolean;
+  alternateRowBackgroundColor?: string;
+  enableAlternateRows?: boolean;
+  fontSize?: number;
+  rowFontSize?: number;
+  borderColor?: string;
+  borderWidth?: number;
+  borderRadius?: number;
+  cellPadding?: number;
+  cellPaddingY?: number;
+  tableWidth?: string;
+  groupHeaderMarginBottom?: number;
+  groupHeaderPaddingY?: number;
+  headerMarginBottom?: number;
+  headerPaddingY?: number;
+  cellSpacingX?: number;
+  cellSpacingY?: number;
+}
+
+export interface TableRenderProps {
+  data?: {
+    columns: TableColumnConfig[];
+    items: TableRowData[];
+    groups?: any[];
+  };
+  config?: TableConfig;
   theme?: ComponentTheme;
 }

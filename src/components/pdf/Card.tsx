@@ -1,13 +1,13 @@
 import { StyleSheet, View } from '@react-pdf/renderer';
 import React, { ReactNode } from 'react';
 
-interface HighlightCardTheme {
+interface CardTheme {
   borderColor?: string;
 }
 
-interface HighlightCardProps {
+interface CardProps {
   children?: ReactNode;
-  theme?: HighlightCardTheme;
+  theme?: CardTheme;
 }
 
 const styles = StyleSheet.create({
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function HighlightCard({ children, theme }: HighlightCardProps) {
+export default function Card({ children, theme }: CardProps) {
   const borderColor = theme?.borderColor ?? '#E2E8F0';
 
   return <View style={[styles.container, { borderColor }]}>{children}</View>;
