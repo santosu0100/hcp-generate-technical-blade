@@ -1,20 +1,20 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { usePdfBuilder } from '../context/PdfBuilderContext';
 import { Download, FileJson, Upload, Plus } from 'lucide-react';
-import { SidebarLeft } from '../components/builder/SidebarLeft';
-import { Canvas } from '../components/builder/Canvas';
-import { SidebarRight } from '../components/builder/SidebarRight';
-import { AutosaveManager } from '../components/builder/AutosaveManager';
-import { useAutosave } from '../hooks/useAutosave';
+import { SidebarLeft } from '@/components/builder/SidebarLeft/SidebarLeft';
+import { Canvas } from '@/components/builder/Canvas/Canvas';
+import { SidebarRight } from '@/components/builder/SidebarRight/SidebarRight';
+import { AutosaveManager } from '@/components/builder/AutosaveManager';
+import { useAutosave } from '@/hooks/useAutosave';
 import { pdf } from '@react-pdf/renderer';
-import { OperationTechnicalBladeDocument } from '../components/pdf/render/operation-technical-blade-document';
+import { OperationTechnicalBladeDocument } from '../components/pdf/render/OperationTechnicalBladeDocument';
 import { PasteJsonModal } from '../components/builder/PasteJsonModal';
 
 export function BuilderPage() {
   const { getPayload, loadPayload } = usePdfBuilder();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { lastSaved, clearAutosave } = useAutosave();
-  const [isPasteModalOpen, setIsPasteModalOpen] = React.useState(false);
+  const [isPasteModalOpen, setIsPasteModalOpen] = useState(false);
 
   const handleExportJson = () => {
     const payload = getPayload();

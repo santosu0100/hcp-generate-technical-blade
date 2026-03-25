@@ -17,6 +17,9 @@ interface TitleDescriptionConfig {
   titleColor?: string;
   descriptionColor?: string;
   linkColor?: string;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
+  titleFontSize?: number;
+  descriptionFontSize?: number;
 }
 
 interface TitleDescriptionProps {
@@ -24,6 +27,7 @@ interface TitleDescriptionProps {
   description: string;
   links?: LinkData[];
   config?: TitleDescriptionConfig;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   theme?: TitleDescriptionTheme;
 }
 
@@ -42,21 +46,25 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 8,
-    lineHeight: 1,
+    lineHeight: 1.2,
   },
 });
 
-export default function TitleDescription({ title, description, links, config, theme }: TitleDescriptionProps) {
+export default function TitleDescription({ title, description, links, config, textAlign, theme }: TitleDescriptionProps) {
+  const align = textAlign ?? config?.textAlign ?? 'left';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
+  
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
   const linkColor = config?.linkColor ?? theme?.primaryColor ?? '#4338CA';
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleRow}>
-        <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+    <View style={[styles.container, { textAlign: align }]}>
+      <View style={[styles.titleRow, { textAlign: align }]}>
+        <Text style={[styles.title, { color: titleColor, fontSize: titleFontSize }]}>{title}</Text>
       </View>
-      <Text style={[styles.description, { color: descriptionColor }]}>
+      <Text style={[styles.description, { color: descriptionColor, fontSize: descriptionFontSize }]}>
         {description}
         {links && links.length > 0 && (
           <>

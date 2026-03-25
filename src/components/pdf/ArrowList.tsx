@@ -16,11 +16,14 @@ interface ArrowListConfig {
   arrowColor?: string;
   titleColor?: string;
   descriptionColor?: string;
+  titleFontSize?: number;
+  descriptionFontSize?: number;
 }
 
 interface ArrowListProps {
   items: ArrowListItem[];
   config?: ArrowListConfig;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   theme?: ArrowListTheme;
 }
 
@@ -57,13 +60,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function ArrowList({ items, config, theme }: ArrowListProps) {
+export default function ArrowList({ items, config, textAlign = 'left', theme }: ArrowListProps) {
   const arrowColor = config?.arrowColor ?? theme?.primaryColor ?? '#FFD700';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { textAlign }]}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
           <View style={styles.arrowWrapper}>
@@ -72,9 +77,9 @@ export default function ArrowList({ items, config, theme }: ArrowListProps) {
             </Svg>
           </View>
           <Text style={styles.content}>
-            <Text style={[styles.title, { color: titleColor }]}>{item.title}</Text>
-            <Text style={[styles.colon, { color: titleColor }]}>: </Text>
-            <Text style={[styles.description, { color: descriptionColor }]}>{item.description}</Text>
+            <Text style={[styles.title, { color: titleColor, textAlign, fontSize: titleFontSize }]}>{item.title}</Text>
+            <Text style={[styles.colon, { color: titleColor, textAlign, fontSize: titleFontSize }]}>: </Text>
+            <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>{item.description}</Text>
           </Text>
         </View>
       ))}

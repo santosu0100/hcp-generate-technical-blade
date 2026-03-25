@@ -1,26 +1,12 @@
-import type { ReactElement } from 'react';
 import type { ComponentThemeConfig } from '../utils/themes';
-import type {
-  ActionButtonDataDTO,
-  TextDataDTO,
-  LabelValueDataDTO,
-  BigIntDataDTO,
-  LabelValueVariant,
-  ComponentConfigDTO,
-  ComponentDataDTO,
-} from './components.dto';
 
-// Component theme type alias for use in renderers
-export type ComponentTheme = ComponentThemeConfig;
+// ============================================
+// Component Types
+// ============================================
 
-export const ComponentCategory = {
-  LAYOUT: 'Layout Estrutural',
-  COMPONENTS: 'Componentes Principais',
-} as const;
+export type LabelValueVariant = 'default' | 'bolder-label' | 'bolder-value' | 'bolder-both';
+export type BulletListVariant = 'label-bolder' | 'value-bolder';
 
-export type ComponentCategory = typeof ComponentCategory[keyof typeof ComponentCategory];
-
-// Component type - all valid component types
 export type ComponentType =
   | 'brand'
   | 'card'
@@ -42,16 +28,8 @@ export type ComponentType =
   | 'table'
   | 'box-group';
 
-// Base component interface - all components share these properties
-export interface BaseComponentDTO {
-  type: ComponentType;
-  config?: unknown;
-  data?: unknown;
-  children?: BaseComponentDTO[];
-}
-
 // ============================================
-// Config types for each component
+// Component Config Types
 // ============================================
 
 export interface BrandConfig {
@@ -105,8 +83,6 @@ export interface OrderedDescriptionConfig {
   numberColor?: string;
 }
 
-export type BulletListVariant = 'label-bolder' | 'value-bolder';
-
 export interface BulletListConfig {
   bulletColor?: string;
   labelColor?: string;
@@ -155,6 +131,37 @@ export interface BoxGroupConfig {
   gapY?: number;
 }
 
+export interface TableColumnConfig {
+  key: string;
+  label: string;
+  width?: number | string;
+  style?: {
+    backgroundColor?: string;
+    textColor?: string;
+    bold?: boolean;
+    italic?: boolean;
+    align?: 'left' | 'right' | 'center';
+  };
+  bold?: boolean;
+  italic?: boolean;
+  color?: string;
+  align?: 'left' | 'right' | 'center';
+}
+
+export interface TableGroupConfig {
+  label: string;
+  columns: string[];
+  backgroundColor?: string;
+  textColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+}
+
+export interface TableRowData {
+  cells: Record<string, string | number>;
+  style?: { backgroundColor?: string; textColor?: string; bold?: boolean; italic?: boolean };
+}
+
 export interface TableConfig {
   variant?: string;
   headerBackgroundColor?: string;
@@ -186,7 +193,7 @@ export interface TableConfig {
 }
 
 // ============================================
-// Data types for components
+// Component Data Types
 // ============================================
 
 export interface LinkData {
@@ -236,37 +243,6 @@ export interface MarkerListData {
   }[];
 }
 
-export interface TableColumnConfig {
-  key: string;
-  label: string;
-  width?: number | string;
-  style?: {
-    backgroundColor?: string;
-    textColor?: string;
-    bold?: boolean;
-    italic?: boolean;
-    align?: 'left' | 'right' | 'center';
-  };
-  bold?: boolean;
-  italic?: boolean;
-  color?: string;
-  align?: 'left' | 'right' | 'center';
-}
-
-export interface TableGroupConfig {
-  label: string;
-  columns: string[];
-  backgroundColor?: string;
-  textColor?: string;
-  bold?: boolean;
-  italic?: boolean;
-}
-
-export interface TableRowData {
-  cells: Record<string, string | number>;
-  style?: { backgroundColor?: string; textColor?: string; bold?: boolean; italic?: boolean };
-}
-
 export interface TableData {
   columns: TableColumnConfig[];
   items: TableRowData[];
@@ -277,13 +253,43 @@ export interface SectionData {
   title: string;
 }
 
+export interface LabelValueData {
+  label: string;
+  value: string;
+}
+
+export interface BigIntData {
+  value: string;
+  label?: string;
+}
+
+export interface ActionButtonData {
+  label: string;
+  href: string;
+}
+
+export interface TextData {
+  content: string;
+}
+
 // ============================================
-// Discriminated union for ComponentDTO
+// Base Component DTO
+// ============================================
+
+export interface BaseComponentDTO {
+  type: ComponentType;
+  config?: unknown;
+  data?: unknown;
+  children?: BaseComponentDTO[];
+}
+
+// ============================================
+// Discriminated Union Component DTOs
 // ============================================
 
 export interface BrandComponentDTO {
   type: 'brand';
-  config?: BrandConfig & ComponentConfigDTO;
+  config?: BrandConfig;
   children?: never;
 }
 
@@ -295,31 +301,31 @@ export interface CardComponentDTO {
 
 export interface LabelValueComponentDTO {
   type: 'label-value';
-  data?: LabelValueDataDTO;
-  config?: ComponentConfigDTO & { variant?: LabelValueVariant };
+  data?: LabelValueData;
+  config?: ComponentConfigDTO & { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
 }
 
 export interface BigIntComponentDTO {
   type: 'big-int';
-  data?: BigIntDataDTO;
-  config?: ComponentConfigDTO & { labelPosition?: 'before' | 'after' };
+  data?: BigIntData;
+  config?: ComponentConfigDTO & { labelPosition?: 'before' | 'after'; fontSize?: number };
 }
 
 export interface ActionButtonComponentDTO {
   type: 'action-button';
-  data?: ActionButtonDataDTO;
+  data?: ActionButtonData;
   config?: ComponentConfigDTO;
 }
 
 export interface SidebarComponentDTO {
   type: 'sidebar';
-  config?: SidebarConfig & ComponentConfigDTO;
+  config?: SidebarConfig;
   children?: ComponentDTO[];
 }
 
 export interface TextComponentDTO {
   type: 'text';
-  data?: TextDataDTO;
+  data?: TextData;
   config?: TextConfig & ComponentConfigDTO;
 }
 
@@ -395,7 +401,6 @@ export interface BoxGroupComponentDTO {
   children?: ComponentDTO[];
 }
 
-// Union type for all component DTOs
 export type ComponentDTO =
   | BrandComponentDTO
   | CardComponentDTO
@@ -418,132 +423,66 @@ export type ComponentDTO =
   | BoxGroupComponentDTO;
 
 // ============================================
-// Render function types
+// Component Config DTO
 // ============================================
 
-export type RenderChildFn = (child: ComponentDTO) => ReactElement | null;
+export interface ComponentConfigDTO {
+  // Layout & Spacing
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
+  width?: string;
+  position?: 'left' | 'right' | 'center';
 
-// Base renderer props for dynamic rendering
-export interface BaseRendererProps {
-  config?: ComponentConfigDTO;
-  data?: ComponentDataDTO;
-  children?: ComponentDTO[];
-  theme?: ComponentTheme;
-  renderChild: RenderChildFn;
+  // Text alignment
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
+  align?: 'left' | 'right' | 'center' | 'justify';
+
+  // Typography
+  fontSize?: number;
+  fontWeight?: 'normal' | 'bold';
+  color?: string;
+
+  // Component-specific
+  variant?: string;
+  alignment?: 'left' | 'right' | 'center';
+  titleColor?: string;
+  labelPosition?: 'before' | 'after';
+  originator?: string;
+
+  // Group/Section layout config
+  layout?: 'row' | 'column';
+  itemsPerRow?: number;
+  gapX?: number;
+  gapY?: number;
+
+  // Table config
+  headerBackgroundColor?: string;
+  headerTextColor?: string;
+  headerBold?: boolean;
+  headerItalic?: boolean;
+  groupHeaderBackgroundColor?: string;
+  groupHeaderTextColor?: string;
+  groupHeaderBold?: boolean;
+  groupHeaderItalic?: boolean;
+  rowBackgroundColor?: string;
+  rowTextColor?: string;
+  rowBold?: boolean;
+  rowItalic?: boolean;
+  alternateRowBackgroundColor?: string;
+  borderColor?: string;
+  borderWidth?: number;
+  borderRadius?: number;
+  cellPadding?: number;
+  tableWidth?: string;
+  enableAlternateRows?: boolean;
+  headerMarginBottom?: number;
+  groupHeaderMarginBottom?: number;
+  cellSpacingX?: number;
+  cellSpacingY?: number;
+  cellPaddingY?: number;
+  rowFontSize?: number;
 }
 
-// Type for the component renderers record - using generic function type
-export type ComponentRendererFn = (props: BaseRendererProps) => ReactElement | null;
-
-// ============================================
-// Renderer props for each component (for type safety in registry)
-// ============================================
-
-export interface BrandRendererProps {
-  config?: BrandConfig & ComponentConfigDTO;
-}
-
-export interface CardRendererProps {
-  children?: ComponentDTO[];
-  renderChild: RenderChildFn;
-  theme?: ComponentTheme;
-  config?: ComponentConfigDTO;
-}
-
-export interface LabelValueRendererProps {
-  data?: LabelValueDataDTO;
-  config?: ComponentConfigDTO & { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
-  theme?: ComponentTheme;
-}
-
-export interface BigIntRendererProps {
-  data?: BigIntDataDTO;
-  config?: ComponentConfigDTO & { labelPosition?: 'before' | 'after'; fontSize?: number };
-  theme?: ComponentTheme;
-}
-
-export interface ActionButtonRendererProps {
-  data?: ActionButtonDataDTO;
-  theme?: ComponentTheme;
-  config?: ComponentConfigDTO;
-}
-
-export interface SidebarRendererProps {
-  config?: SidebarConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
-  renderChild: RenderChildFn;
-}
-
-export interface TextRendererProps {
-  data?: TextDataDTO;
-  config?: TextConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface SectionRendererProps {
-  data?: SectionData;
-  config?: SectionConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
-  renderChild: RenderChildFn;
-  theme?: ComponentTheme;
-}
-
-export interface FooterRendererProps {
-  children?: ComponentDTO[];
-  renderChild: RenderChildFn;
-  config?: ComponentConfigDTO;
-}
-
-export interface LinkRendererProps {
-  data?: LinkData;
-  config?: LinkConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface TitleDescriptionRendererProps {
-  data?: TitleDescriptionData;
-  config?: TitleDescriptionConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface OrderedDescriptionRendererProps {
-  data?: OrderedDescriptionData;
-  config?: OrderedDescriptionConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface BulletListRendererProps {
-  data?: BulletListData;
-  config?: BulletListConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface ArrowListRendererProps {
-  data?: ArrowListData;
-  config?: ArrowListConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface OrderedListRendererProps {
-  data?: OrderedListData;
-  config?: OrderedListConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface MarkerListRendererProps {
-  data?: MarkerListData;
-  config?: MarkerListConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface TableRendererProps {
-  data?: TableData;
-  config?: TableConfig & ComponentConfigDTO;
-  theme?: ComponentTheme;
-}
-
-export interface BoxGroupRendererProps {
-  config?: BoxGroupConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
-  renderChild: RenderChildFn;
-}
+export type ComponentTheme = ComponentThemeConfig;

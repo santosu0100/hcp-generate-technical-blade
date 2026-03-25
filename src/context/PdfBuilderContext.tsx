@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { ComponentDTO, ComponentType } from '../types/pdf-components.types';
+import { ComponentDTO, ComponentType } from '../components/pdf/render/types';
 import { OriginatorType } from '../types/operation-technical-blade.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -38,11 +38,12 @@ export const usePdfBuilder = () => {
 function addNode(nodes: WrappedComponent[], parentId: string, newNode: WrappedComponent): WrappedComponent[] {
   return nodes.map(n => {
     if (n.id === parentId) {
-      const children = n.dto.children || [];
-      return { ...n, dto: { ...n.dto, children: [...children, newNode.dto] }, _childrenWrapped: [...(n._childrenWrapped || []), newNode] };
+      const children = (n.dto as any).children || [];
+      return { ...n, dto: { ...n.dto, children: [...children, newNode.dto] } as any, _childrenWrapped: [...(n._childrenWrapped || []), newNode] };
     }
     if (n._childrenWrapped) {
-      return { ...n, _childrenWrapped: addNode(n._childrenWrapped, parentId, newNode), dto: { ...n.dto, children: addNode(n._childrenWrapped, parentId, newNode).map(x => x.dto) } };
+      const newChildrenWrapped = addNode(n._childrenWrapped, parentId, newNode);
+      return { ...n, _childrenWrapped: newChildrenWrapped, dto: { ...n.dto, children: newChildrenWrapped.map(x => x.dto) } as any };
     }
     return n;
   });
@@ -51,24 +52,24 @@ function addNode(nodes: WrappedComponent[], parentId: string, newNode: WrappedCo
 function addNodeAtIndex(nodes: WrappedComponent[], parentId: string, newNode: WrappedComponent, index?: number): WrappedComponent[] {
   return nodes.map(n => {
     if (n.id === parentId) {
-      const children = [...(n._childrenWrapped || [])];
+      const childrenWrapped = [...(n._childrenWrapped || [])];
       if (index !== undefined) {
-        children.splice(index, 0, newNode);
+        childrenWrapped.splice(index, 0, newNode);
       } else {
-        children.push(newNode);
+        childrenWrapped.push(newNode);
       }
       return { 
         ...n, 
-        _childrenWrapped: children, 
-        dto: { ...n.dto, children: children.map(x => x.dto) } 
+        _childrenWrapped: childrenWrapped, 
+        dto: { ...n.dto, children: childrenWrapped.map(x => x.dto) } as any
       };
     }
     if (n._childrenWrapped) {
-      const newChild = addNodeAtIndex(n._childrenWrapped, parentId, newNode, index);
+      const newChildWrapped = addNodeAtIndex(n._childrenWrapped, parentId, newNode, index);
       return { 
         ...n, 
-        _childrenWrapped: newChild, 
-        dto: { ...n.dto, children: newChild.map(x => x.dto) } 
+        _childrenWrapped: newChildWrapped, 
+        dto: { ...n.dto, children: newChildWrapped.map(x => x.dto) } as any
       };
     }
     return n;
@@ -79,7 +80,7 @@ function removeNode(nodes: WrappedComponent[], id: string): WrappedComponent[] {
   return nodes.filter(n => n.id !== id).map(n => {
     if (n._childrenWrapped) {
       const newChild = removeNode(n._childrenWrapped, id);
-      return { ...n, _childrenWrapped: newChild, dto: { ...n.dto, children: newChild.map(x => x.dto) } };
+      return { ...n, _childrenWrapped: newChild, dto: { ...n.dto, children: newChild.map(x => x.dto) } as any };
     }
     return n;
   });
@@ -89,11 +90,11 @@ function updateNode(nodes: WrappedComponent[], id: string, newDto: Partial<Compo
   return nodes.map(n => {
     if (n.id === id) {
       const nextDto = { ...n.dto, ...newDto };
-      return { ...n, dto: nextDto };
+      return { ...n, dto: nextDto as any };
     }
     if (n._childrenWrapped) {
       const newChild = updateNode(n._childrenWrapped, id, newDto);
-      return { ...n, _childrenWrapped: newChild, dto: { ...n.dto, children: newChild.map(x => x.dto) } };
+      return { ...n, _childrenWrapped: newChild, dto: { ...n.dto, children: newChild.map(x => x.dto) } as any };
     }
     return n;
   });
@@ -118,7 +119,7 @@ function moveNodeDeep(nodes: WrappedComponent[], id: string, direction: 'up' | '
   return nodes.map(n => {
     if (n._childrenWrapped) {
       const newC = moveNodeDeep(n._childrenWrapped, id, direction);
-      return { ...n, _childrenWrapped: newC, dto: { ...n.dto, children: newC.map(c => c.dto) } };
+      return { ...n, _childrenWrapped: newC, dto: { ...n.dto, children: newC.map(c => c.dto) } as any };
     }
     return n;
   });
@@ -147,11 +148,11 @@ function buildWrappedTree(components: any[]): WrappedComponent[] {
 
 function extractDtoExt(nodes: WrappedComponent[]): ComponentDTO[] {
   return nodes.map(n => {
-    const c = { ...n.dto };
+    const c = { ...n.dto } as any;
     if (n._childrenWrapped) {
       c.children = extractDtoExt(n._childrenWrapped);
     }
-    return c;
+    return c as ComponentDTO;
   });
 }
 
@@ -168,7 +169,7 @@ export const PdfBuilderProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const newComponent: WrappedComponent = {
       id: uuidv4(),
-      dto: { type, config: initialConfig || {}, data: {}, children: [] },
+      dto: { type, config: initialConfig || {}, data: {}, children: [] } as any,
       _childrenWrapped: []
     };
     

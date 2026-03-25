@@ -1,8 +1,8 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { PDFViewer } from '@react-pdf/renderer';
-import { OperationTechnicalBladeDocument } from '../../components/pdf/render/operation-technical-blade-document';
-import { ComponentType } from '../../types/pdf-components.types';
+import { OperationTechnicalBladeDocument } from '@/components/pdf/render/OperationTechnicalBladeDocument';
+import { ComponentType } from '@/components/pdf/render/types';
 
 interface Props {
   type: ComponentType;

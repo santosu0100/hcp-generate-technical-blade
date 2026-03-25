@@ -11,6 +11,7 @@ interface BigIntProps {
   label?: string;
   labelPosition?: 'before' | 'after';
   primaryColor?: string;
+  fontSize?: number;
   theme?: BigIntTheme;
 }
 
@@ -46,14 +47,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function BigInt({ value, label, labelPosition = 'after', primaryColor, theme }: BigIntProps) {
+export default function BigInt({ value, label, labelPosition = 'after', primaryColor, fontSize, theme }: BigIntProps) {
   const valueColor = primaryColor ?? theme?.primaryColor ?? '#fccd42';
   const labelColor = theme?.textSecondary ?? '#4A4A4A';
+  const resolvedFontSize = fontSize ?? 30;
 
   if (!label) {
     return (
       <View style={styles.container}>
-        <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
+        <Text style={[styles.value, { color: valueColor, fontSize: resolvedFontSize }]}>{value}</Text>
       </View>
     );
   }
@@ -63,7 +65,7 @@ export default function BigInt({ value, label, labelPosition = 'after', primaryC
       {labelPosition === 'before' && (
         <Text style={[styles.label, styles.labelBefore, { color: labelColor }]}>{label}</Text>
       )}
-      <Text style={[styles.value, { color: valueColor }]}>{value}</Text>
+      <Text style={[styles.value, { color: valueColor, fontSize: resolvedFontSize }]}>{value}</Text>
       {labelPosition === 'after' && (
         <Text style={[styles.label, styles.labelAfter, { color: labelColor }]}>{label}</Text>
       )}

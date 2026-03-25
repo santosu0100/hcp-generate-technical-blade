@@ -19,11 +19,14 @@ interface BulletListConfig {
   labelColor?: string;
   valueColor?: string;
   variant?: BulletListVariant;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
+  fontSize?: number;
 }
 
 interface BulletListProps {
   items: BulletItem[];
   config?: BulletListConfig;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   theme?: BulletListTheme;
 }
 
@@ -82,9 +85,11 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function BulletList({ items, config, theme }: BulletListProps) {
+export default function BulletList({ items, config, textAlign, theme }: BulletListProps) {
   const variant = config?.variant ?? 'value-bolder';
   const isLabelBolder = variant === 'label-bolder';
+  const align = textAlign ?? config?.textAlign ?? 'left';
+  const fontSize = config?.fontSize ?? 8;
 
   const bulletColor =
     config?.bulletColor ?? (isLabelBolder ? theme?.primaryColor ?? '#1E3A5F' : theme?.textSecondary ?? '#71717A');
@@ -92,7 +97,7 @@ export default function BulletList({ items, config, theme }: BulletListProps) {
   const valueColor = config?.valueColor ?? theme?.textSecondary ?? '#71717A';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { textAlign: align }]}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
           <View style={styles.bulletContainer}>

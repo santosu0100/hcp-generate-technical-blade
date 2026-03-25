@@ -15,15 +15,21 @@ interface MarkerListTheme {
 
 interface MarkerListConfig {
   markerColor?: string;
+  markerSize?: number;
   numberColor?: string;
   lineColor?: string;
   titleColor?: string;
   descriptionColor?: string;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
+  titleFontSize?: number;
+  descriptionFontSize?: number;
+  numberFontSize?: number;
 }
 
 interface MarkerListProps {
   items: MarkerListItem[];
   config?: MarkerListConfig;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   theme?: MarkerListTheme;
 }
 
@@ -171,7 +177,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function MarkerList({ items, config, theme }: MarkerListProps) {
+export default function MarkerList({ items, config, textAlign, theme }: MarkerListProps) {
+  const align = textAlign ?? config?.textAlign ?? 'left';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 7;
+  const numberFontSize = config?.numberFontSize ?? 6;
+  const markerSize = config?.markerSize ?? MARKER_SIZE;
+
   const markerColor = config?.markerColor ?? theme?.primaryColor ?? '#FFCC00';
   const numberColor = config?.numberColor ?? '#000000';
   const lineColor = config?.lineColor ?? '#E2E8F0';
@@ -213,20 +225,20 @@ export default function MarkerList({ items, config, theme }: MarkerListProps) {
               </Svg>
             </View>
           )}
-          <View style={[styles.markerWrapper, { backgroundColor: markerColor }]}>
-            <Text style={[styles.number, { color: numberColor }]}>{index + 1}</Text>
+          <View style={[styles.markerWrapper, { backgroundColor: markerColor, width: markerSize, height: markerSize, borderRadius: markerSize / 2 }]}>
+            <Text style={[styles.number, { color: numberColor, fontSize: numberFontSize }]}>{index + 1}</Text>
           </View>
         </View>
         <View style={styles.content}>
-          <Text style={[styles.title, { color: titleColor }]}>{item.title}</Text>
-          <Text style={[styles.description, { color: descriptionColor }]}>{item.description}</Text>
+          <Text style={[styles.title, { color: titleColor, fontSize: titleFontSize }]}>{item.title}</Text>
+          <Text style={[styles.description, { color: descriptionColor, fontSize: descriptionFontSize }]}>{item.description}</Text>
         </View>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { textAlign: align }]}>
       {rows.map((row, rowIndex) => {
         const isFirstRow = rowIndex === 0;
         const isLastRow = rowIndex === rows.length - 1;

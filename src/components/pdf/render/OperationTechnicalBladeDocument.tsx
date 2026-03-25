@@ -1,11 +1,11 @@
 import React from 'react';
 import { Document, Page, StyleSheet, View, Font } from '@react-pdf/renderer';
-import { OperationTechnicalBladeDTO } from '../../../types/operation-technical-blade.dto';
-import { ComponentDTO } from '../../../types/pdf-components.types';
-import { ComponentRenderer } from './component-renderer';
+import { OperationTechnicalBladeDTO } from '@/types/operation-technical-blade.dto';
+import { ComponentDTO } from './types';
+import { ComponentRenderer } from './ComponentRenderer';
 import PageLayout from '../PageLayout';
-import { DEFAULT_ORIGINATOR } from '../../../utils/originators';
-import '../../../utils/fonts'; // Registrar fonte Poppins globalmente
+import { DEFAULT_ORIGINATOR } from '@/utils/originators';
+import '@/utils/fonts'; // Registrar fonte Poppins globalmente
 
 // Disable hyphenation
 Font.registerHyphenationCallback(word => [word]);

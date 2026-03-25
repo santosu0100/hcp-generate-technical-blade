@@ -1,4 +1,3 @@
-import React from 'react';
 import { Trash2, Save } from 'lucide-react';
 
 interface AutosaveManagerProps {

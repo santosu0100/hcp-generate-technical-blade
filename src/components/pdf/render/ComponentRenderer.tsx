@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
-import { ComponentDTO, ComponentTheme } from '../../../types/pdf-components.types';
-import { componentRenderers } from './component-registry';
-import { resolveComponentTheme, ComponentThemeConfig } from '../../../utils/themes';
+import { ComponentDTO, ComponentTheme } from './types';
+import { componentRenderers } from './ComponentRegistry';
+import { resolveComponentTheme, ComponentThemeConfig } from '@/utils/themes';
 
 export interface ComponentRendererContext {
   originator?: string;
@@ -13,9 +13,9 @@ interface ComponentRendererProps {
 }
 
 export function ComponentRenderer({ component, context }: ComponentRendererProps): ReactElement | null {
-  const { type, config, data, children } = component;
+  const { type, config, data, children } = component as any;
 
-  const renderer = componentRenderers[type];
+  const renderer = (componentRenderers as any)[type];
 
   if (!renderer) {
     console.warn(`Unknown component type: ${type}`);
@@ -33,7 +33,7 @@ export function ComponentRenderer({ component, context }: ComponentRendererProps
   );
 
   return renderer({
-    config,
+    config: config as any,
     data,
     children,
     theme: resolvedTheme as ComponentTheme,

@@ -16,11 +16,16 @@ interface OrderedListConfig {
   numberColor?: string;
   titleColor?: string;
   descriptionColor?: string;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
+  titleFontSize?: number;
+  descriptionFontSize?: number;
+  numberFontSize?: number;
 }
 
 interface OrderedListProps {
   items: OrderedListItem[];
   config?: OrderedListConfig;
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   theme?: OrderedListTheme;
 }
 
@@ -54,13 +59,18 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function OrderedList({ items, config, theme }: OrderedListProps) {
+export default function OrderedList({ items, config, textAlign, theme }: OrderedListProps) {
+  const align = textAlign ?? config?.textAlign ?? 'left';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
+  const numberFontSize = config?.numberFontSize ?? 10;
+
   const numberColor = config?.numberColor ?? theme?.primaryColor ?? '#FFCC00';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { textAlign: align }]}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
           <Text style={styles.content}>

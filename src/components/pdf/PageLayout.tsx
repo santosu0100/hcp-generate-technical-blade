@@ -1,7 +1,7 @@
 import { StyleSheet, View } from '@react-pdf/renderer';
 import React from 'react';
-import { ComponentDTO } from '../../types/pdf-components.types';
-import { ComponentRenderer, ComponentRendererContext } from './render/component-renderer';
+import { ComponentDTO } from './render/types';
+import { ComponentRenderer, ComponentRendererContext } from './render/ComponentRenderer';
 import Sidebar from './Sidebar';
 import Footer from './Footer';
 
@@ -46,7 +46,7 @@ function renderComponents(components: ComponentDTO[], context: ComponentRenderer
 }
 
 export default function PageLayout({ brand, sidebar, footer, components, context }: PageLayoutProps) {
-  const isLeftAligned = sidebar?.config?.position === 'left';
+  const isLeftAligned = (sidebar?.config as any)?.position === 'left';
 
   const brandElement = brand && (
     <View style={styles.brandContainer} fixed>
@@ -56,13 +56,13 @@ export default function PageLayout({ brand, sidebar, footer, components, context
 
   const sidebarElement = sidebar && (
     <View style={isLeftAligned ? styles.sidebarLeft : styles.sidebarRight} fixed>
-      <Sidebar width={sidebar.config?.width}>{renderComponents(sidebar.children ?? [], context)}</Sidebar>
+      <Sidebar width={(sidebar.config as any)?.width}>{renderComponents((sidebar as any).children ?? [], context)}</Sidebar>
     </View>
   );
 
   const mainContentElement = <View style={styles.mainContent}>{renderComponents(components ?? [], context)}</View>;
 
-  const footerElement = <Footer>{renderComponents(footer?.children ?? [], context)}</Footer>;
+  const footerElement = <Footer>{renderComponents((footer as any)?.children ?? [], context)}</Footer>;
 
   return (
     <View style={styles.page}>
