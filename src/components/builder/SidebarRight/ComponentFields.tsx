@@ -2,6 +2,8 @@ import React from 'react';
 import { FileText, Settings, List, Edit3, Columns } from 'lucide-react';
 import { PropertySection, PropertyField } from './PropertyBase';
 import { ComponentType } from '@/components/pdf/render/types';
+import { ListItemEditor } from './ListItemEditor';
+import { Plus, Link as LinkIcon, Trash2 } from 'lucide-react';
 
 interface ComponentFieldsProps {
   type: ComponentType;
@@ -21,6 +23,20 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
         </PropertySection>
       );
 
+    case 'action-button':
+    case 'link':
+      return (
+        <PropertySection title="Configurações" icon={<LinkIcon size={14}/>}>
+          <PropertyField label="Rótulo / Texto" value={data.label} onChange={(val) => onUpdateData({ label: val })} />
+          <PropertyField label="Link (URL)" value={data.href} onChange={(val) => onUpdateData({ href: val })} />
+          {type === 'action-button' && (
+            <div className="pt-2">
+              <PropertyField label="Cor de Fundo" value={config.backgroundColor} onChange={(val) => onUpdateConfig({ backgroundColor: val })} type="color" />
+            </div>
+          )}
+        </PropertySection>
+      );
+
     case 'section':
       return (
         <PropertySection title="Configurações do Título" icon={<Settings size={14}/>}>
@@ -34,7 +50,21 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
         <PropertySection title="Conteúdo" icon={<FileText size={14}/>}>
           <PropertyField label="Título" value={data.title} onChange={(val) => onUpdateData({ title: val })} />
           <PropertyField label="Descrição" value={data.description} onChange={(val) => onUpdateData({ description: val })} />
-          <div className="flex gap-4">
+          
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <ListItemEditor 
+              title="Links Relacionados"
+              items={data.links || []}
+              onUpdate={(links) => onUpdateData({ ...data, links })}
+              fields={[
+                { name: 'label', label: 'Texto do Link', placeholder: 'Ver detalhes...' },
+                { name: 'href', label: 'URL / Link', placeholder: 'https://...' }
+              ]}
+              addButtonLabel="Novo Link"
+            />
+          </div>
+
+          <div className="mt-4 flex gap-4">
             <div className="flex-1">
               <PropertyField label="Fonte Título" value={config.titleFontSize} onChange={(val) => onUpdateConfig({ titleFontSize: val })} type="number" />
             </div>
@@ -87,9 +117,20 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
     case 'arrow-list':
       return (
         <PropertySection title="Configurações da Lista" icon={<List size={14}/>}>
-          <div className="space-y-4">
-            <p className="text-[10px] text-slate-500 italic">Edite os itens no JSON (breve editor de lista).</p>
-            <div className="flex gap-4">
+          <div className="space-y-6">
+            <ListItemEditor 
+              title="Itens da Lista"
+              items={data.items || []}
+              onUpdate={(items) => onUpdateData({ items })}
+              fields={
+                type === 'bullet-list' 
+                  ? [{ name: 'label', label: 'Rótulo' }, { name: 'value', label: 'Valor' }]
+                  : [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }]
+              }
+              addButtonLabel="Novo Item"
+            />
+
+            <div className="pt-4 border-t border-white/5 flex gap-4">
               <div className="flex-1">
                 <PropertyField label="Fonte Título" value={config.titleFontSize} onChange={(val) => onUpdateConfig({ titleFontSize: val })} type="number" />
               </div>
@@ -110,6 +151,34 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 </select>
               </div>
             )}
+          </div>
+        </PropertySection>
+      );
+
+    case 'ordered-description':
+      return (
+        <PropertySection title="Lista de Itens" icon={<List size={14}/>}>
+          <div className="space-y-6">
+            <ListItemEditor 
+              title="Itens"
+              items={data.items || []}
+              onUpdate={(items) => onUpdateData({ items })}
+              fields={[
+                { name: 'title', label: 'Título' },
+                { name: 'description', label: 'Descrição', type: 'textarea' }
+              ]}
+              addButtonLabel="Novo Item"
+            />
+            {/* Nota: OrderedDescription também suporta links por item no DTO, mas simplificaremos por enquanto */}
+            
+            <div className="pt-4 border-t border-white/5 flex gap-4">
+              <div className="flex-1">
+                <PropertyField label="Fonte Título" value={config.titleFontSize} onChange={(val) => onUpdateConfig({ titleFontSize: val })} type="number" />
+              </div>
+              <div className="flex-1">
+                <PropertyField label="Fonte Desc." value={config.descriptionFontSize} onChange={(val) => onUpdateConfig({ descriptionFontSize: val })} type="number" />
+              </div>
+            </div>
           </div>
         </PropertySection>
       );
