@@ -1,21 +1,32 @@
 import React, { ReactElement } from 'react';
-import { ComponentDTO, ComponentTheme } from './types';
 import { componentRenderers } from './ComponentRegistry';
-import { resolveComponentTheme, ComponentThemeConfig } from '@/utils/themes';
+import type { BaseComponentDTO } from '@/types/components.dto';
+import type { RenderChildFn } from './types';
+import { resolveComponentTheme } from '@/utils/themes';
+import type { ComponentThemeConfig } from '@/utils/themes';
 
 export interface ComponentRendererContext {
   originator?: string;
 }
 
 interface ComponentRendererProps {
-  component: ComponentDTO;
+  component: BaseComponentDTO;
   context: ComponentRendererContext;
 }
 
-export function ComponentRenderer({ component, context }: ComponentRendererProps): ReactElement | null {
-  const { type, config, data, children } = component as any;
+// Helper type for renderer function
+type RendererFunction = (props: {
+  config?: unknown;
+  data?: unknown;
+  children?: BaseComponentDTO[];
+  theme?: ComponentThemeConfig;
+  renderChild: RenderChildFn;
+}) => ReactElement | null;
 
-  const renderer = (componentRenderers as any)[type];
+export function ComponentRenderer({ component, context }: ComponentRendererProps): ReactElement | null {
+  const { type, config, data, children } = component;
+
+  const renderer = (componentRenderers as Record<string, RendererFunction>)[type];
 
   if (!renderer) {
     console.warn(`Unknown component type: ${type}`);
@@ -28,20 +39,20 @@ export function ComponentRenderer({ component, context }: ComponentRendererProps
     originator: context.originator,
   });
 
-  const renderChild = (child: ComponentDTO) => (
+  const renderChild: RenderChildFn = child => (
     <ComponentRenderer key={Math.random()} component={child} context={context} />
   );
 
   return renderer({
-    config: config as any,
+    config,
     data,
     children,
-    theme: resolvedTheme as ComponentTheme,
+    theme: resolvedTheme,
     renderChild,
-  }) as ReactElement | null;
+  });
 }
 
-export function renderComponents(components: ComponentDTO[], context: ComponentRendererContext): ReactElement[] {
+export function renderComponents(components: BaseComponentDTO[], context: ComponentRendererContext): ReactElement[] {
   return components
     .map((component, index) => <ComponentRenderer key={index} component={component} context={context} />)
     .filter(Boolean);

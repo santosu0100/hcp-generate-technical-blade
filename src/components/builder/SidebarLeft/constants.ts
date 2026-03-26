@@ -1,4 +1,5 @@
-import { ComponentType, ComponentCategory } from '@/components/pdf/render/types';
+import { ComponentType } from '@/types/components.dto';
+import { ComponentCategory } from '@/components/pdf/render/types';
 
 export const COMPONENT_LIST: { type: ComponentType, icon: string, label: string, desc: string, category: ComponentCategory }[] = [
   // Layout Estrutural
@@ -23,4 +24,5 @@ export const COMPONENT_LIST: { type: ComponentType, icon: string, label: string,
   { type: 'table' as ComponentType, icon: '📊', label: 'Tabela', desc: 'Grade de dados estruturada', category: ComponentCategory.COMPONENTS },
   { type: 'text' as ComponentType, icon: '📝', label: 'Texto', desc: 'Texto simples ou longo', category: ComponentCategory.COMPONENTS },
   { type: 'title-description' as ComponentType, icon: 'Aa', label: 'Título e Descrição', desc: 'Bloco de texto com links', category: ComponentCategory.COMPONENTS },
+  { type: 'chart' as ComponentType, icon: '📈', label: 'Gráfico', desc: 'Gráficos de barra, linha, pizza, etc.', category: ComponentCategory.COMPONENTS },
 ].sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'));

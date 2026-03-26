@@ -8,7 +8,13 @@ interface StyleSettingsProps {
 
 export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
   const updateConfig = (field: string, value: any) => {
-    setConfig({ ...config, [field]: value });
+    const newConfig = { ...config };
+    if (value === '' || value === undefined || value === null || (typeof value === 'number' && isNaN(value))) {
+      delete newConfig[field];
+    } else {
+      newConfig[field] = value;
+    }
+    setConfig(newConfig);
   };
 
   return (
@@ -24,19 +30,22 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-300 text-[11px] uppercase tracking-wider">Variante base</label>
             <div className="flex gap-2">
-              {['standard', 'secondary'].map(v => (
-                <button 
-                  key={v}
-                  onClick={() => updateConfig('variant', v)}
-                  className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold border transition-all ${
-                    (config.variant || 'standard') === v 
-                      ? 'bg-blue-500 border-blue-400 text-white shadow-lg' 
-                      : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'
-                  }`}
-                >
-                  {v === 'standard' ? 'Padrão' : 'Secundária'}
-                </button>
-              ))}
+              <button 
+                onClick={() => updateConfig('variant', 'default')}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold border transition-all ${
+                  config.variant !== 'standard' ? 'bg-blue-500 border-blue-400 text-white shadow-lg' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'
+                }`}
+              >
+                Padrão (Default)
+              </button>
+              <button 
+                onClick={() => updateConfig('variant', 'standard')}
+                className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold border transition-all ${
+                  config.variant === 'standard' ? 'bg-indigo-500 border-indigo-400 text-white shadow-lg' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'
+                }`}
+              >
+                Standard
+              </button>
             </div>
           </div>
 
@@ -145,7 +154,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
             <label className="text-[10px] text-slate-500 uppercase font-bold">Tam. Fonte (Header)</label>
             <input 
               type="number" 
-              value={config.fontSize || 8}
+              value={config.fontSize ?? ''}
+              placeholder="8"
               onChange={(e) => updateConfig('fontSize', parseInt(e.target.value))}
               className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
             />
@@ -154,7 +164,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
             <label className="text-[10px] text-slate-500 uppercase font-bold">Tam. Fonte (Corpo)</label>
             <input 
               type="number" 
-              value={config.rowFontSize || 7}
+              value={config.rowFontSize ?? ''}
+              placeholder="7"
               onChange={(e) => updateConfig('rowFontSize', parseInt(e.target.value))}
               className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
             />
@@ -186,7 +197,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
             <label className="text-[10px] text-slate-500 uppercase font-bold">Largura Tabela</label>
             <input 
               type="text" 
-              value={config.tableWidth || '100%'}
+              value={config.tableWidth ?? ''}
+              placeholder="100%"
               onChange={(e) => updateConfig('tableWidth', e.target.value)}
               className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
             />
@@ -202,7 +214,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
             <input 
               type="number" 
               step="0.1"
-              value={config.borderWidth || 1}
+              value={config.borderWidth ?? ''}
+              placeholder="1"
               onChange={(e) => updateConfig('borderWidth', parseFloat(e.target.value))}
               className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
             />
@@ -211,7 +224,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
             <label className="text-[10px] text-slate-500 uppercase font-bold">Arredondamento</label>
             <input 
               type="number" 
-              value={config.borderRadius || 4}
+              value={config.borderRadius ?? ''}
+              placeholder="4"
               onChange={(e) => updateConfig('borderRadius', parseInt(e.target.value))}
               className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
             />
@@ -231,7 +245,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
               <label className="text-[10px] text-slate-500 uppercase font-bold">Padding X Célula</label>
               <input 
                 type="number" 
-                value={config.cellPadding || 4}
+                value={config.cellPadding ?? ''}
+                placeholder="4"
                 onChange={(e) => updateConfig('cellPadding', parseInt(e.target.value))}
                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
               />
@@ -240,7 +255,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
               <label className="text-[10px] text-slate-500 uppercase font-bold">Padding Y Célula</label>
               <input 
                 type="number" 
-                value={config.cellPaddingY || 2}
+                value={config.cellPaddingY ?? ''}
+                placeholder="2"
                 onChange={(e) => updateConfig('cellPaddingY', parseInt(e.target.value))}
                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
               />
@@ -249,7 +265,8 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
               <label className="text-[10px] text-slate-500 uppercase font-bold">Margem Header</label>
               <input 
                 type="number" 
-                value={config.headerMarginBottom || 4}
+                value={config.headerMarginBottom ?? ''}
+                placeholder="4"
                 onChange={(e) => updateConfig('headerMarginBottom', parseInt(e.target.value))}
                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
               />
@@ -258,11 +275,32 @@ export function StyleSettings({ config, setConfig }: StyleSettingsProps) {
               <label className="text-[10px] text-slate-500 uppercase font-bold">Margem Grupos</label>
               <input 
                 type="number" 
-                value={config.groupHeaderMarginBottom || 2}
+                value={config.groupHeaderMarginBottom ?? ''}
+                placeholder="2"
                 onChange={(e) => updateConfig('groupHeaderMarginBottom', parseInt(e.target.value))}
                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
               />
-           </div>
+            </div>
+            <div className="space-y-1">
+               <label className="text-[10px] text-slate-500 uppercase font-bold">Espaçam. Horiz.</label>
+               <input 
+                 type="number" 
+                 value={config.cellSpacingX ?? ''}
+                 placeholder="4"
+                 onChange={(e) => updateConfig('cellSpacingX', parseInt(e.target.value))}
+                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
+               />
+            </div>
+            <div className="space-y-1">
+               <label className="text-[10px] text-slate-500 uppercase font-bold">Espaçam. Vert.</label>
+               <input 
+                 type="number" 
+                 value={config.cellSpacingY ?? ''}
+                 placeholder="4"
+                 onChange={(e) => updateConfig('cellSpacingY', parseInt(e.target.value))}
+                 className="w-full bg-black/20 border border-white/10 rounded px-3 py-2 text-xs text-white outline-none focus:border-blue-500"
+               />
+            </div>
         </div>
       </section>
     </div>

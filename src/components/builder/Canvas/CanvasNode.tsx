@@ -20,7 +20,7 @@ export function CanvasNode({ node, level = 0, index, parentId }: CanvasNodeProps
   
   const [dropPos, setDropPos] = useState<'before' | 'after' | 'inside' | null>(null);
 
-  const supportsChildren = ['section', 'sidebar', 'footer', 'card'].includes(node.dto.type);
+  const supportsChildren = ['section', 'sidebar', 'footer', 'card', 'box-group'].includes(node.dto.type);
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.stopPropagation();

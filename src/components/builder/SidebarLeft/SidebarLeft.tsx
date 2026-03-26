@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePdfBuilder } from '@/context/PdfBuilderContext';
-import { ComponentType, ComponentCategory } from '@/components/pdf/render/types';
+import { ComponentType } from '@/types/components.dto';
+import { ComponentCategory } from '@/components/pdf/render/types';
 import { ComponentPreviewModal } from '../ComponentPreviewModal';
 import { SearchBox } from './SearchBox';
 import { CategoryGroup } from './CategoryGroup';

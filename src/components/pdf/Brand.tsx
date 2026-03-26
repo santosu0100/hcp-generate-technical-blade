@@ -1,6 +1,6 @@
 import { StyleSheet, View, Image } from '@react-pdf/renderer';
 import React from 'react';
-import { Originator, DEFAULT_ORIGINATOR, getLogoPath } from '../../utils/originators';
+import { Originator, DEFAULT_ORIGINATOR, getLogoPath } from '@/utils/originators';
 
 type Alignment = 'left' | 'right' | 'center';
 

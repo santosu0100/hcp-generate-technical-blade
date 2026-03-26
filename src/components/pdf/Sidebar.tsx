@@ -2,7 +2,7 @@ import { StyleSheet, View } from '@react-pdf/renderer';
 import React, { ReactNode } from 'react';
 
 interface SidebarProps {
-  width?: number | string;
+  width?: number;
   children: ReactNode;
 }
 

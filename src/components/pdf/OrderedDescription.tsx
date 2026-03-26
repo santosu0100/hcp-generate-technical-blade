@@ -7,7 +7,7 @@ interface LinkData {
   href: string;
 }
 
-interface TimelineItem {
+interface OrderedDescriptionItem {
   title: string;
   description: string;
   links?: LinkData[];
@@ -22,14 +22,24 @@ interface OrderedDescriptionTheme {
 
 interface OrderedDescriptionConfig {
   circleColor?: string;
+  circleBackgroundColor?: string;
   titleColor?: string;
   descriptionColor?: string;
   lineColor?: string;
   linkColor?: string;
+  titleFontSize?: number;
+  descriptionFontSize?: number;
+  numberFontSize?: number;
+  numberColor?: string;
+  markerGap?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface OrderedDescriptionProps {
-  items: TimelineItem[];
+  items: OrderedDescriptionItem[];
   config?: OrderedDescriptionConfig;
   theme?: OrderedDescriptionTheme;
 }
@@ -91,29 +101,55 @@ const styles = StyleSheet.create({
 });
 
 export default function OrderedDescription({ items, config, theme }: OrderedDescriptionProps) {
-  const circleColor = config?.circleColor ?? theme?.primaryColor ?? '#FFCC00';
+  const circleBackgroundColor =
+    config?.circleBackgroundColor ?? config?.circleColor ?? theme?.primaryColor ?? '#FFCC00';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
   const lineColor = config?.lineColor ?? theme?.lineColor ?? '#E2E8F0';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
+  const numberFontSize = config?.numberFontSize ?? 7;
+  const numberColor = config?.numberColor ?? '#000000';
+  const markerGap = config?.markerGap ?? 6;
+
+  // Dynamic circle size based on number font size
+  const circleSize = Math.max(12, numberFontSize + 5);
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   return (
-    <View style={styles.container}>
+    <View style={containerStyle}>
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
 
         return (
           <View key={index} style={styles.itemContainer}>
-            <View style={styles.numberColumn}>
-              <View style={[styles.circle, { backgroundColor: circleColor }]}>
-                <Text style={styles.circleNumber}>{index + 1}</Text>
+            <View style={[styles.numberColumn, { width: circleSize }]}>
+              <View
+                style={[
+                  styles.circle,
+                  {
+                    backgroundColor: circleBackgroundColor,
+                    width: circleSize,
+                    height: circleSize,
+                    borderRadius: circleSize / 2,
+                  },
+                ]}>
+                <Text style={[styles.circleNumber, { fontSize: numberFontSize, color: numberColor }]}>{index + 1}</Text>
               </View>
               {!isLast && <View style={[styles.line, { backgroundColor: lineColor }]} />}
             </View>
-            <View style={isLast ? styles.lastContentColumn : styles.contentColumn}>
-              <View style={styles.titleRow}>
-                <Text style={[styles.title, { color: titleColor }]}>{item.title}</Text>
+            <View style={[isLast ? styles.lastContentColumn : styles.contentColumn, { paddingLeft: markerGap }]}>
+              <View style={[styles.titleRow, { height: circleSize }]}>
+                <Text style={[styles.title, { color: titleColor, fontSize: titleFontSize }]}>{item.title}</Text>
               </View>
-              <Text style={[styles.description, { color: descriptionColor }]}>
+              <Text style={[styles.description, { color: descriptionColor, fontSize: descriptionFontSize }]}>
                 {item.description}
                 {item.links && item.links.length > 0 && (
                   <>

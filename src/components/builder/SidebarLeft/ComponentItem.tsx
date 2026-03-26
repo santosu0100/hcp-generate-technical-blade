@@ -1,4 +1,4 @@
-import { ComponentType } from '@/components/pdf/render/types';
+import { ComponentType } from '@/types/components.dto';
 
 interface ComponentItemProps {
   type: ComponentType;

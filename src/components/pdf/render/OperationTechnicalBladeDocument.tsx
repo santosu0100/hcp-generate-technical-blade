@@ -1,9 +1,8 @@
 import React from 'react';
-import { Document, Page, StyleSheet, View, Font } from '@react-pdf/renderer';
+import { Document, Page, StyleSheet, Font } from '@react-pdf/renderer';
 import { OperationTechnicalBladeDTO } from '@/types/operation-technical-blade.dto';
-import { ComponentDTO } from './types';
-import { ComponentRenderer } from './ComponentRenderer';
-import PageLayout from '../PageLayout';
+import type { ComponentDTO } from '@/types/components.dto';
+import PageLayout from '@/components/pdf/PageLayout';
 import { DEFAULT_ORIGINATOR } from '@/utils/originators';
 import '@/utils/fonts'; // Registrar fonte Poppins globalmente
 

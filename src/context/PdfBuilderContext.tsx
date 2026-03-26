@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { ComponentDTO, ComponentType } from '../components/pdf/render/types';
+import { ComponentDTO, ComponentType } from '../types/components.dto';
 import { OriginatorType } from '../types/operation-technical-blade.dto';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -146,13 +146,40 @@ function buildWrappedTree(components: any[]): WrappedComponent[] {
   });
 }
 
+function prunePayload(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(item => (typeof item === 'object' && item !== null) ? prunePayload(item) : item);
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const pruned: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
+        if (typeof value === 'object') {
+          const nested = prunePayload(value);
+          if (Array.isArray(nested)) {
+            if (nested.length > 0) pruned[key] = nested;
+          } else if (Object.keys(nested).length > 0) {
+            pruned[key] = nested;
+          }
+        } else {
+          pruned[key] = value;
+        }
+      }
+    }
+    return pruned;
+  }
+  return obj;
+}
+
 function extractDtoExt(nodes: WrappedComponent[]): ComponentDTO[] {
   return nodes.map(n => {
-    const c = { ...n.dto } as any;
-    if (n._childrenWrapped) {
-      c.children = extractDtoExt(n._childrenWrapped);
+    const rawDto = { ...n.dto } as any;
+    if (n._childrenWrapped && n._childrenWrapped.length > 0) {
+      rawDto.children = extractDtoExt(n._childrenWrapped);
+    } else {
+      delete rawDto.children;
     }
-    return c as ComponentDTO;
+    return prunePayload(rawDto) as ComponentDTO;
   });
 }
 

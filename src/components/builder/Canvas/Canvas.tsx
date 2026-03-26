@@ -17,8 +17,8 @@ export function Canvas() {
   const footer = rootComponents.filter(c => c.dto.type === 'footer');
   const main = rootComponents.filter(c => !['brand', 'sidebar', 'footer'].includes(c.dto.type));
 
-  const hasLeftSidebar = sidebar.some(c => (c.dto.config as any)?.position !== 'right');
-  const hasRightSidebar = sidebar.some(c => (c.dto.config as any)?.position === 'right');
+  const hasLeftSidebar = sidebar.some(c => (c.dto as any).config?.position !== 'right');
+  const hasRightSidebar = sidebar.some(c => (c.dto as any).config?.position === 'right');
   const noSidebar = sidebar.length === 0;
 
   return (
@@ -39,7 +39,7 @@ export function Canvas() {
                 <ZoneDropArea 
                   title="Sidebar Esquerda" 
                   className={`shrink-0 transition-all ${hasLeftSidebar ? 'w-[260px]' : 'w-[120px]'}`}
-                  currentNodes={sidebar.filter(c => (c.dto.config as any)?.position !== 'right')} 
+                  currentNodes={sidebar.filter(c => (c.dto as any).config?.position !== 'right')} 
                   onDropType={(type) => type === 'sidebar'} 
                   initialConfig={{ position: 'left' }}
                 />
@@ -56,7 +56,7 @@ export function Canvas() {
                 <ZoneDropArea 
                   title="Sidebar Direita" 
                   className={`shrink-0 transition-all ${hasRightSidebar ? 'w-[260px]' : 'w-[120px]'}`}
-                  currentNodes={sidebar.filter(c => (c.dto.config as any)?.position === 'right')} 
+                  currentNodes={sidebar.filter(c => (c.dto as any).config?.position === 'right')} 
                   onDropType={(type) => type === 'sidebar'} 
                   initialConfig={{ position: 'right' }}
                 />

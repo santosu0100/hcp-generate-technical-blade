@@ -17,9 +17,12 @@ interface TitleDescriptionConfig {
   titleColor?: string;
   descriptionColor?: string;
   linkColor?: string;
-  textAlign?: 'left' | 'right' | 'center' | 'justify';
   titleFontSize?: number;
   descriptionFontSize?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface TitleDescriptionProps {
@@ -46,25 +49,38 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 8,
-    lineHeight: 1.2,
+    lineHeight: 1,
   },
 });
 
-export default function TitleDescription({ title, description, links, config, textAlign, theme }: TitleDescriptionProps) {
-  const align = textAlign ?? config?.textAlign ?? 'left';
-  const titleFontSize = config?.titleFontSize ?? 8;
-  const descriptionFontSize = config?.descriptionFontSize ?? 8;
-  
+export default function TitleDescription({
+  title,
+  description,
+  links,
+  config,
+  textAlign = 'left',
+  theme,
+}: TitleDescriptionProps) {
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
   const linkColor = config?.linkColor ?? theme?.primaryColor ?? '#4338CA';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   return (
-    <View style={[styles.container, { textAlign: align }]}>
-      <View style={[styles.titleRow, { textAlign: align }]}>
-        <Text style={[styles.title, { color: titleColor, fontSize: titleFontSize }]}>{title}</Text>
+    <View style={containerStyle}>
+      <View style={styles.titleRow}>
+        <Text style={[styles.title, { color: titleColor, textAlign, fontSize: titleFontSize }]}>{title}</Text>
       </View>
-      <Text style={[styles.description, { color: descriptionColor, fontSize: descriptionFontSize }]}>
+      <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>
         {description}
         {links && links.length > 0 && (
           <>

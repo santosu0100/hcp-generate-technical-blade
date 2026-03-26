@@ -3,18 +3,20 @@ import React from 'react';
 interface PropertyFieldProps {
   label: string;
   value: string | number | undefined;
-  onChange: (val: string | number) => void;
+  onChange: (val: any) => void;
   type?: 'text' | 'number' | 'color' | 'textarea';
+  placeholder?: string;
 }
 
-export function PropertyField({ label, value, onChange, type = 'text' }: PropertyFieldProps) {
+export function PropertyField({ label, value, onChange, type = 'text', placeholder }: PropertyFieldProps) {
   if (type === 'textarea') {
     return (
       <div className="mb-4">
         <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">{label}</label>
         <textarea 
           value={value || ''} 
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => onChange(e.target.value || undefined)}
+          placeholder={placeholder}
           rows={6}
           className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500 focus:bg-white/10 transition-all shadow-inner resize-none"
         />
@@ -27,11 +29,16 @@ export function PropertyField({ label, value, onChange, type = 'text' }: Propert
       <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">{label}</label>
       <input 
         type={type}
-        value={value || ''} 
+        value={type === 'color' ? (value || '#000000') : (value ?? '')} 
         onChange={(e) => {
-          const val = type === 'number' ? (parseInt(e.target.value) || 0) : e.target.value;
+          if (e.target.value === '') {
+            onChange(undefined);
+            return;
+          }
+          const val = type === 'number' ? (parseFloat(e.target.value)) : e.target.value;
           onChange(val);
         }}
+        placeholder={placeholder}
         className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500 focus:bg-white/10 transition-all shadow-inner"
       />
     </div>

@@ -25,9 +25,20 @@ export function useTableState(componentId: string) {
 
   useEffect(() => {
     if (!component) return;
+    
+    const pruneObject = (obj: any) => {
+      if (!obj) return {};
+      return Object.entries(obj).reduce((acc: any, [key, value]) => {
+        if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+    };
+
     updateComponent(componentId, {
       data: { ...component.dto.data, columns, items, groups },
-      config: config
+      config: pruneObject(config)
     });
   }, [columns, items, groups, config, componentId]);
 

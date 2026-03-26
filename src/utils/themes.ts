@@ -1,4 +1,4 @@
-import type { ComponentType } from '../components/pdf/render/types';
+import type { ComponentType } from '../types/components.dto';
 import type { Originator } from './originators';
 
 // Theme configuration for each component
@@ -50,7 +50,7 @@ const borumTheme: Partial<Record<ComponentType, ComponentThemeConfig>> = {
     textPrimary: '#212121',
     textSecondary: '#666666',
     lineColor: '#E2E8F0',
-    },
+  },
   'arrow-list': { primaryColor: '#1E3A5F', textPrimary: '#212121', textSecondary: '#666666' },
   'ordered-list': { primaryColor: '#1E3A5F', textPrimary: '#212121', textSecondary: '#666666' },
   'marker-list': { primaryColor: '#1E3A5F', textPrimary: '#212121', textSecondary: '#666666' },

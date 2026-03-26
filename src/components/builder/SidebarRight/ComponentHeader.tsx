@@ -3,7 +3,7 @@ import {
   Type, Layout, Image as ImageIcon, FileText, 
   Columns, Footprints, Table as TableIcon, Settings 
 } from 'lucide-react';
-import { ComponentType } from '@/components/pdf/render/types';
+import { ComponentType } from '@/types/components.dto';
 
 interface ComponentHeaderProps {
   type: ComponentType;

@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View, Svg } from '@react-pdf/renderer';
+import { StyleSheet, Text, View, Svg, Path, Circle, Rect } from '@react-pdf/renderer';
 import React from 'react';
 
 interface MarkerListItem {
   title: string;
   description: string;
-  icon?: string; // Full SVG string
+  icon?: string;
 }
 
 interface MarkerListTheme {
@@ -15,15 +15,18 @@ interface MarkerListTheme {
 
 interface MarkerListConfig {
   markerColor?: string;
-  markerSize?: number;
   numberColor?: string;
   lineColor?: string;
   titleColor?: string;
   descriptionColor?: string;
-  textAlign?: 'left' | 'right' | 'center' | 'justify';
   titleFontSize?: number;
   descriptionFontSize?: number;
   numberFontSize?: number;
+  markerGap?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface MarkerListProps {
@@ -33,23 +36,17 @@ interface MarkerListProps {
   theme?: MarkerListTheme;
 }
 
-// Parse SVG string and extract elements for react-pdf
 function parseSvgElements(svgString: string): React.ReactNode[] {
   if (!svgString) return [];
-
   const elements: React.ReactNode[] = [];
-
-  // Extract paths
   const pathRegex = /<path[^>]*d="([^"]*)"[^>]*\/>/g;
   let pathMatch: RegExpExecArray | null;
   while ((pathMatch = pathRegex.exec(svgString)) !== null) {
     const d = pathMatch[1];
     const fillMatch = pathMatch[0].match(/fill="([^"]*)"/);
     const fill = fillMatch ? fillMatch[1] : 'currentColor';
-    elements.push(<path key={`path-${elements.length}`} d={d} fill={fill} />);
+    elements.push(<Path key={`path-${elements.length}`} d={d} fill={fill} />);
   }
-
-  // Extract circles
   const circleRegex = /<circle[^>]*cx="([^"]*)"[^>]*cy="([^"]*)"[^>]*r="([^"]*)"[^>]*\/>/g;
   let circleMatch: RegExpExecArray | null;
   while ((circleMatch = circleRegex.exec(svgString)) !== null) {
@@ -58,10 +55,8 @@ function parseSvgElements(svgString: string): React.ReactNode[] {
     const r = circleMatch[3];
     const fillMatch = circleMatch[0].match(/fill="([^"]*)"/);
     const fill = fillMatch ? fillMatch[1] : 'currentColor';
-    elements.push(<circle key={`circle-${elements.length}`} cx={cx} cy={cy} r={r} fill={fill} />);
+    elements.push(<Circle key={`circle-${elements.length}`} cx={cx} cy={cy} r={r} fill={fill} />);
   }
-
-  // Extract rects
   const rectRegex = /<rect[^>]*x="([^"]*)"[^>]*y="([^"]*)"[^>]*width="([^"]*)"[^>]*height="([^"]*)"[^>]*\/>/g;
   let rectMatch: RegExpExecArray | null;
   while ((rectMatch = rectRegex.exec(svgString)) !== null) {
@@ -71,13 +66,11 @@ function parseSvgElements(svgString: string): React.ReactNode[] {
     const height = rectMatch[4];
     const fillMatch = rectMatch[0].match(/fill="([^"]*)"/);
     const fill = fillMatch ? fillMatch[1] : 'currentColor';
-    elements.push(<rect key={`rect-${elements.length}`} x={x} y={y} width={width} height={height} fill={fill} />);
+    elements.push(<Rect key={`rect-${elements.length}`} x={x} y={y} width={width} height={height} fill={fill} />);
   }
-
   return elements;
 }
 
-// Extract viewBox from SVG string
 function extractViewBox(svgString: string): string {
   const match = svgString.match(/viewBox="([^"]*)"/);
   return match ? match[1] : '0 0 24 24';
@@ -93,51 +86,29 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   item: {
-    width: '48%',
+    flex: 1,
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    paddingBottom: 4,
   },
-  // Left item with line coming from top-left corner
-  itemLeftWithLine: {
-    width: '48%',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderTopWidth: LINE_WIDTH,
-    borderLeftWidth: LINE_WIDTH,
-    borderTopLeftRadius: 4,
-  },
-  // Right item with line going down on LEFT side
-  itemRightWithLine: {
-    width: '48%',
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    borderLeftWidth: LINE_WIDTH,
-  },
-  // Connector between rows: horizontal line bridging left and right items
-  connectorRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    height: 12,
-  },
-  connectorLeft: {
-    width: '48%',
-    borderBottomWidth: LINE_WIDTH,
-    borderLeftWidth: LINE_WIDTH,
-    borderBottomLeftRadius: 4,
-  },
-  connectorRight: {
-    width: '48%',
-    borderLeftWidth: LINE_WIDTH,
-  },
-  markerColumn: {
-    width: 24,
+  // Left section containing line and marker
+  leftSection: {
+    width: 40,
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'flex-end', // Align to right
+    paddingRight: 6, // Position line 6px from right edge
+  },
+  // Vertical line segment
+  lineSegment: {
+    width: LINE_WIDTH,
+    backgroundColor: '#E2E8F0',
+  },
+  // Marker container
+  markerContainer: {
     paddingTop: 4,
-    paddingLeft: 4,
+    alignItems: 'flex-end',
+    paddingRight: 1,
   },
   iconWrapper: {
     width: ICON_SIZE,
@@ -155,12 +126,11 @@ const styles = StyleSheet.create({
     fontSize: 6,
     fontWeight: 'bold',
   },
+  // Content section
   content: {
     flex: 1,
-    flexDirection: 'column',
     paddingLeft: 4,
     paddingRight: 4,
-    paddingBottom: 4,
   },
   title: {
     fontSize: 8,
@@ -169,26 +139,39 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 7,
-    fontWeight: 'normal',
     lineHeight: 1.3,
   },
-  placeholder: {
-    width: '48%',
+  // Connector row between items
+  connectorRow: {
+    flexDirection: 'row',
+    height: 14,
+  },
+  connectorLeft: {
+    flex: 1,
+  },
+  connectorRight: {
+    flex: 1,
   },
 });
 
-export default function MarkerList({ items, config, textAlign, theme }: MarkerListProps) {
-  const align = textAlign ?? config?.textAlign ?? 'left';
-  const titleFontSize = config?.titleFontSize ?? 8;
-  const descriptionFontSize = config?.descriptionFontSize ?? 7;
-  const numberFontSize = config?.numberFontSize ?? 6;
-  const markerSize = config?.markerSize ?? MARKER_SIZE;
-
+export default function MarkerList({ items, config, textAlign = 'left', theme }: MarkerListProps) {
   const markerColor = config?.markerColor ?? theme?.primaryColor ?? '#FFCC00';
   const numberColor = config?.numberColor ?? '#000000';
   const lineColor = config?.lineColor ?? '#E2E8F0';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 7;
+  const numberFontSize = config?.numberFontSize ?? 6;
+  const markerGap = config?.markerGap ?? 4;
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   // Group items into rows of 2
   const rows: { left?: MarkerListItem; right?: MarkerListItem; leftIndex?: number; rightIndex?: number }[] = [];
@@ -201,78 +184,96 @@ export default function MarkerList({ items, config, textAlign, theme }: MarkerLi
     });
   }
 
-  const renderItem = (item: MarkerListItem, index: number, isLeft: boolean, showLine: boolean) => {
-    // Determine which style to use based on position and whether line should show
-    let itemStyle = styles.item;
-
-    if (showLine) {
-      if (isLeft) {
-        // Left item: line comes from top-left corner (border-top and border-left)
-        itemStyle = styles.itemLeftWithLine;
-      } else {
-        // Right item: line goes to bottom-right corner (border-right and border-bottom)
-        itemStyle = styles.itemRightWithLine;
-      }
-    }
+  const renderItem = (item: MarkerListItem, index: number, lineAbove: boolean, lineBelow: boolean) => {
+    // Line height calculations
+    const lineAboveHeight = lineAbove ? 10 : 0;
+    const lineBelowHeight = lineBelow ? 10 : 0;
 
     return (
-      <View key={index} style={[itemStyle, { borderColor: lineColor }]}>
-        <View style={styles.markerColumn}>
-          {item.icon && (
-            <View style={styles.iconWrapper}>
-              <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox={extractViewBox(item.icon)}>
-                {parseSvgElements(item.icon)}
-              </Svg>
+      <View key={index} style={styles.item}>
+        <View style={styles.leftSection}>
+          {/* Line above marker */}
+          {lineAbove && <View style={[styles.lineSegment, { height: lineAboveHeight, backgroundColor: lineColor }]} />}
+
+          {/* Marker */}
+          <View style={styles.markerContainer}>
+            {item.icon && (
+              <View style={styles.iconWrapper}>
+                <Svg width={ICON_SIZE} height={ICON_SIZE} viewBox={extractViewBox(item.icon)}>
+                  {parseSvgElements(item.icon)}
+                </Svg>
+              </View>
+            )}
+            <View style={[styles.markerWrapper, { backgroundColor: markerColor }]}>
+              <Text style={[styles.number, { color: numberColor, fontSize: numberFontSize }]}>{index + 1}</Text>
             </View>
-          )}
-          <View style={[styles.markerWrapper, { backgroundColor: markerColor, width: markerSize, height: markerSize, borderRadius: markerSize / 2 }]}>
-            <Text style={[styles.number, { color: numberColor, fontSize: numberFontSize }]}>{index + 1}</Text>
           </View>
+
+          {/* Line below marker */}
+          {lineBelow && <View style={[styles.lineSegment, { height: lineBelowHeight, backgroundColor: lineColor }]} />}
         </View>
-        <View style={styles.content}>
-          <Text style={[styles.title, { color: titleColor, fontSize: titleFontSize }]}>{item.title}</Text>
-          <Text style={[styles.description, { color: descriptionColor, fontSize: descriptionFontSize }]}>{item.description}</Text>
+        <View style={[styles.content, { paddingLeft: markerGap }]}>
+          <Text style={[styles.title, { color: titleColor, textAlign, fontSize: titleFontSize }]}>{item.title}</Text>
+          <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>{item.description}</Text>
         </View>
       </View>
     );
   };
 
+  // Connector between rows - draws the inverted U using SVG
+  const SnakeConnector = () => {
+    const width = 360;
+    const lineX = 34; // X position of line (40px - 6px from right)
+    const rightLineX = width / 2 + lineX; // X position of right item's line
+    const height = 14;
+    const midY = height / 2;
+
+    // Path: from right line (top) -> down -> left -> down to left line (bottom)
+    const pathD = `M ${rightLineX} 0 L ${rightLineX} ${midY} L ${lineX} ${midY} L ${lineX} ${height}`;
+
+    return (
+      <View style={styles.connectorRow}>
+        <Svg width={width} height={height}>
+          <Path d={pathD} stroke={lineColor} strokeWidth={LINE_WIDTH} fill="none" />
+        </Svg>
+      </View>
+    );
+  };
+
   return (
-    <View style={[styles.container, { textAlign: align }]}>
+    <View style={containerStyle}>
       {rows.map((row, rowIndex) => {
         const isFirstRow = rowIndex === 0;
         const isLastRow = rowIndex === rows.length - 1;
+        const hasMoreItems = items.length > 2;
 
-        // Line logic:
-        // - Item 1 (first row, left): NO line
-        // - Item 2 (first row, right): line going DOWN if there's more rows
-        // - Item 3 (second row, left): line coming FROM TOP
-        // - Item 4 (second row, right): line going DOWN if there's more rows
+        // Snake pattern:
+        // Row 1: [Item 1: no line] [Item 2: line below]
+        // Connector: from Item 2 to Item 3
+        // Row 2: [Item 3: line above] [Item 4: line above if not last]
 
-        const leftShowLine = !isFirstRow;
-        const rightShowLine = !isLastRow;
+        const leftLineAbove = !isFirstRow;
+        const leftLineBelow = !isFirstRow && !isLastRow && hasMoreItems;
+
+        const rightLineAbove = false;
+        const rightLineBelow = !isLastRow && hasMoreItems;
 
         return (
           <React.Fragment key={rowIndex}>
-            {/* Connector row between rows (snake line) */}
-            {!isFirstRow && (
-              <View style={styles.connectorRow}>
-                <View style={[styles.connectorLeft, { borderColor: lineColor }]} />
-                <View style={[styles.connectorRight, { borderColor: lineColor }]} />
-              </View>
-            )}
+            {/* Connector between rows */}
+            {!isFirstRow && <SnakeConnector />}
 
             {/* Items row */}
             <View style={styles.row}>
               {row.left && row.leftIndex !== undefined ? (
-                renderItem(row.left, row.leftIndex, true, leftShowLine)
+                renderItem(row.left, row.leftIndex, leftLineAbove, leftLineBelow)
               ) : (
-                <View style={styles.placeholder} />
+                <View style={styles.item} />
               )}
               {row.right && row.rightIndex !== undefined ? (
-                renderItem(row.right, row.rightIndex, false, rightShowLine)
+                renderItem(row.right, row.rightIndex, rightLineAbove, rightLineBelow)
               ) : (
-                <View style={styles.placeholder} />
+                <View style={styles.item} />
               )}
             </View>
           </React.Fragment>

@@ -18,6 +18,11 @@ interface ArrowListConfig {
   descriptionColor?: string;
   titleFontSize?: number;
   descriptionFontSize?: number;
+  markerGap?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface ArrowListProps {
@@ -66,12 +71,21 @@ export default function ArrowList({ items, config, textAlign = 'left', theme }: 
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
   const titleFontSize = config?.titleFontSize ?? 8;
   const descriptionFontSize = config?.descriptionFontSize ?? 8;
+  const markerGap = config?.markerGap ?? 6;
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   return (
-    <View style={[styles.container, { textAlign }]}>
+    <View style={containerStyle}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
-          <View style={styles.arrowWrapper}>
+          <View style={[styles.arrowWrapper, { marginRight: markerGap }]}>
             <Svg width="8" height="10" viewBox="0 0 8 10">
               <Polygon points="0,0 8,5 0,10" fill={arrowColor} />
             </Svg>
@@ -79,7 +93,9 @@ export default function ArrowList({ items, config, textAlign = 'left', theme }: 
           <Text style={styles.content}>
             <Text style={[styles.title, { color: titleColor, textAlign, fontSize: titleFontSize }]}>{item.title}</Text>
             <Text style={[styles.colon, { color: titleColor, textAlign, fontSize: titleFontSize }]}>: </Text>
-            <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>{item.description}</Text>
+            <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>
+              {item.description}
+            </Text>
           </Text>
         </View>
       ))}

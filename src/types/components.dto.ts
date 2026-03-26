@@ -26,30 +26,39 @@ export type ComponentType =
   | 'ordered-list'
   | 'marker-list'
   | 'table'
-  | 'box-group';
+  | 'box-group'
+  | 'chart';
 
 // ============================================
 // Component Config Types
 // ============================================
 
-export interface BrandConfig {
+/** Base margin config for all components */
+export interface MarginConfig {
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
+}
+
+export interface BrandConfig extends MarginConfig {
   originator?: string;
   alignment?: 'left' | 'right' | 'center';
 }
 
-export interface SidebarConfig {
-  width?: number | string;
+export interface SidebarConfig extends MarginConfig {
+  width?: number;
   position?: 'left' | 'right';
 }
 
-export interface TextConfig {
+export interface TextConfig extends MarginConfig {
   align?: 'left' | 'right' | 'center' | 'justify';
   fontSize?: number;
   fontWeight?: 'normal' | 'bold';
   color?: string;
 }
 
-export interface SectionConfig {
+export interface SectionConfig extends MarginConfig {
   titleColor?: string;
   layout?: 'row' | 'column';
   itemsPerRow?: number;
@@ -57,11 +66,11 @@ export interface SectionConfig {
   gapY?: number;
 }
 
-export interface LinkConfig {
+export interface LinkConfig extends MarginConfig {
   color?: string;
 }
 
-export interface TitleDescriptionConfig {
+export interface TitleDescriptionConfig extends MarginConfig {
   titleColor?: string;
   descriptionColor?: string;
   linkColor?: string;
@@ -70,7 +79,7 @@ export interface TitleDescriptionConfig {
   descriptionFontSize?: number;
 }
 
-export interface OrderedDescriptionConfig {
+export interface OrderedDescriptionConfig extends MarginConfig {
   circleColor?: string;
   circleBackgroundColor?: string;
   titleColor?: string;
@@ -81,27 +90,30 @@ export interface OrderedDescriptionConfig {
   descriptionFontSize?: number;
   numberFontSize?: number;
   numberColor?: string;
+  markerGap?: number;
 }
 
-export interface BulletListConfig {
+export interface BulletListConfig extends MarginConfig {
   bulletColor?: string;
   labelColor?: string;
   valueColor?: string;
   variant?: BulletListVariant;
   textAlign?: 'left' | 'right' | 'center' | 'justify';
   fontSize?: number;
+  markerGap?: number;
 }
 
-export interface ArrowListConfig {
+export interface ArrowListConfig extends MarginConfig {
   arrowColor?: string;
   titleColor?: string;
   descriptionColor?: string;
   textAlign?: 'left' | 'right' | 'center' | 'justify';
   titleFontSize?: number;
   descriptionFontSize?: number;
+  markerGap?: number;
 }
 
-export interface OrderedListConfig {
+export interface OrderedListConfig extends MarginConfig {
   numberColor?: string;
   numberBackgroundColor?: string;
   titleColor?: string;
@@ -110,9 +122,10 @@ export interface OrderedListConfig {
   titleFontSize?: number;
   descriptionFontSize?: number;
   numberFontSize?: number;
+  markerGap?: number;
 }
 
-export interface MarkerListConfig {
+export interface MarkerListConfig extends MarginConfig {
   markerColor?: string;
   markerSize?: number;
   titleColor?: string;
@@ -122,13 +135,83 @@ export interface MarkerListConfig {
   descriptionFontSize?: number;
   numberColor?: string;
   numberFontSize?: number;
+  markerGap?: number;
 }
 
-export interface BoxGroupConfig {
+export interface BoxGroupConfig extends MarginConfig {
   layout?: 'row' | 'column';
   itemsPerRow?: number;
   gapX?: number;
   gapY?: number;
+}
+
+// ============================================
+// Chart Types
+// ============================================
+
+export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
+
+export interface ChartDataset {
+  label: string;
+  data: number[];
+  type?: 'bar' | 'line';
+  backgroundColor?: string | string[];
+  borderColor?: string;
+  borderWidth?: number;
+  yAxisID?: string;
+  /** Line chart options */
+  fill?: boolean;
+  tension?: number;
+  pointRadius?: number;
+  borderDash?: number[];
+}
+
+export interface ChartAxisConfig {
+  display?: boolean;
+  title?: string;
+  min?: number;
+  max?: number;
+  position?: 'left' | 'right';
+}
+
+export interface ChartOptions {
+  title?: string;
+  titleColor?: string;
+  titleFontSize?: number;
+  legendDisplay?: boolean;
+  legendFontSize?: number;
+  tickFontSize?: number;
+  /** Show/hide X axis line and labels */
+  xAxisDisplay?: boolean;
+  /** Show/hide Y axis line and labels */
+  yAxisDisplay?: boolean;
+  /** Show/hide all grid lines (backward compatibility) */
+  gridDisplay?: boolean;
+  /** Show/hide vertical grid lines (X axis) */
+  gridXDisplay?: boolean;
+  /** Show/hide horizontal grid lines (Y axis) */
+  gridYDisplay?: boolean;
+  gridColor?: string;
+  /** Left Y-axis config */
+  yAxis?: ChartAxisConfig;
+  /** Right Y-axis config (for dual-axis charts) */
+  yAxis1?: ChartAxisConfig;
+}
+
+export interface ChartConfig extends MarginConfig {
+  type: ChartType;
+  width?: number;
+  height?: number;
+  /** Use percentage-based width for responsive sizing (e.g., '100%') */
+  widthPercent?: string;
+  /** Fixed height in points for PDF display */
+  displayHeight?: number;
+  options?: ChartOptions;
+}
+
+export interface ChartData {
+  labels: string[];
+  datasets: ChartDataset[];
 }
 
 export interface TableColumnConfig {
@@ -162,7 +245,7 @@ export interface TableRowData {
   style?: { backgroundColor?: string; textColor?: string; bold?: boolean; italic?: boolean };
 }
 
-export interface TableConfig {
+export interface TableConfig extends MarginConfig {
   variant?: string;
   headerBackgroundColor?: string;
   headerTextColor?: string;
@@ -253,25 +336,6 @@ export interface SectionData {
   title: string;
 }
 
-export interface LabelValueData {
-  label: string;
-  value: string;
-}
-
-export interface BigIntData {
-  value: string;
-  label?: string;
-}
-
-export interface ActionButtonData {
-  label: string;
-  href: string;
-}
-
-export interface TextData {
-  content: string;
-}
-
 // ============================================
 // Base Component DTO
 // ============================================
@@ -296,25 +360,23 @@ export interface BrandComponentDTO {
 export interface CardComponentDTO {
   type: 'card';
   children?: ComponentDTO[];
-  config?: ComponentConfigDTO;
 }
 
 export interface LabelValueComponentDTO {
   type: 'label-value';
-  data?: LabelValueData;
-  config?: ComponentConfigDTO & { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
+  data?: LabelValueDataDTO;
+  config?: { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
 }
 
 export interface BigIntComponentDTO {
   type: 'big-int';
-  data?: BigIntData;
-  config?: ComponentConfigDTO & { labelPosition?: 'before' | 'after'; fontSize?: number };
+  data?: BigIntDataDTO;
+  config?: { labelPosition?: 'before' | 'after'; fontSize?: number };
 }
 
 export interface ActionButtonComponentDTO {
   type: 'action-button';
-  data?: ActionButtonData;
-  config?: ComponentConfigDTO;
+  data?: ActionButtonDataDTO;
 }
 
 export interface SidebarComponentDTO {
@@ -325,80 +387,84 @@ export interface SidebarComponentDTO {
 
 export interface TextComponentDTO {
   type: 'text';
-  data?: TextData;
-  config?: TextConfig & ComponentConfigDTO;
+  data?: TextDataDTO;
+  config?: TextConfig;
 }
 
 export interface SectionComponentDTO {
   type: 'section';
   data?: SectionData;
-  config?: SectionConfig & ComponentConfigDTO;
+  config?: SectionConfig;
   children?: ComponentDTO[];
 }
 
 export interface PageBreakComponentDTO {
   type: 'page-break';
-  config?: ComponentConfigDTO;
 }
 
 export interface FooterComponentDTO {
   type: 'footer';
   children?: ComponentDTO[];
-  config?: ComponentConfigDTO;
 }
 
 export interface LinkComponentDTO {
   type: 'link';
   data?: LinkData;
-  config?: LinkConfig & ComponentConfigDTO;
+  config?: LinkConfig;
 }
 
 export interface TitleDescriptionComponentDTO {
   type: 'title-description';
   data?: TitleDescriptionData;
-  config?: TitleDescriptionConfig & ComponentConfigDTO;
+  config?: TitleDescriptionConfig;
 }
 
 export interface OrderedDescriptionComponentDTO {
   type: 'ordered-description';
   data?: OrderedDescriptionData;
-  config?: OrderedDescriptionConfig & ComponentConfigDTO;
+  config?: OrderedDescriptionConfig;
 }
 
 export interface BulletListComponentDTO {
   type: 'bullet-list';
   data?: BulletListData;
-  config?: BulletListConfig & ComponentConfigDTO;
+  config?: BulletListConfig;
 }
 
 export interface ArrowListComponentDTO {
   type: 'arrow-list';
   data?: ArrowListData;
-  config?: ArrowListConfig & ComponentConfigDTO;
+  config?: ArrowListConfig;
 }
 
 export interface OrderedListComponentDTO {
   type: 'ordered-list';
   data?: OrderedListData;
-  config?: OrderedListConfig & ComponentConfigDTO;
+  config?: OrderedListConfig;
 }
 
 export interface MarkerListComponentDTO {
   type: 'marker-list';
   data?: MarkerListData;
-  config?: MarkerListConfig & ComponentConfigDTO;
+  config?: MarkerListConfig;
 }
 
 export interface TableComponentDTO {
   type: 'table';
   data?: TableData;
-  config?: TableConfig & ComponentConfigDTO;
+  config?: TableConfig;
 }
 
 export interface BoxGroupComponentDTO {
   type: 'box-group';
-  config?: BoxGroupConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
+  config?: BoxGroupConfig;
+  children?: BaseComponentDTO[];
+}
+
+export interface ChartComponentDTO {
+  type: 'chart';
+  data?: ChartData;
+  config?: ChartConfig;
 }
 
 export type ComponentDTO =
@@ -420,18 +486,153 @@ export type ComponentDTO =
   | OrderedListComponentDTO
   | MarkerListComponentDTO
   | TableComponentDTO
-  | BoxGroupComponentDTO;
+  | BoxGroupComponentDTO
+  | ChartComponentDTO;
 
 // ============================================
-// Component Config DTO
+// Component Data DTOs (Validation)
 // ============================================
 
-export interface ComponentConfigDTO {
+export interface LabelValueDataDTO {
+  label: string;
+  value: string;
+}
+
+export interface BigIntDataDTO {
+  value: string;
+  label?: string;
+}
+
+export interface ActionButtonDataDTO {
+  label: string;
+  href: string;
+}
+
+export interface TextDataDTO {
+  content: string;
+}
+
+export interface SectionDataDTO {
+  title: string;
+}
+
+export interface TitleDescriptionDataDTO {
+  title: string;
+  description: string;
+  links?: { label: string; href: string }[];
+}
+
+export interface OrderedDescriptionDataDTO {
+  items: {
+    title: string;
+    description: string;
+    links?: { label: string; href: string }[];
+  }[];
+}
+
+export interface BulletListDataDTO {
+  items: {
+    label: string;
+    value: string;
+  }[];
+}
+
+export interface ArrowListDataDTO {
+  items: {
+    title: string;
+    description: string;
+  }[];
+}
+
+export interface OrderedListDataDTO {
+  items: {
+    title: string;
+    description: string;
+  }[];
+}
+
+export interface MarkerListDataDTO {
+  items: {
+    title: string;
+    description: string;
+  }[];
+}
+
+// ============================================
+// Table DTOs (Validation)
+// ============================================
+
+export interface TableColumnStyleDTO {
+  backgroundColor?: string;
+  textColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+  align?: 'left' | 'right' | 'center';
+}
+
+export interface TableColumnDTO {
+  key: string;
+  label: string;
+  width?: number | string;
+  style?: TableColumnStyleDTO;
+  bold?: boolean;
+  italic?: boolean;
+  color?: string;
+  align?: 'left' | 'right' | 'center';
+}
+
+export interface TableRowStyleDTO {
+  backgroundColor?: string;
+  textColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+}
+
+export interface TableRowDTO {
+  [key: string]: string | number | TableRowStyleDTO | undefined;
+  style?: TableRowStyleDTO;
+}
+
+export interface TableColumnGroupDTO {
+  label: string;
+  columns: string[];
+  backgroundColor?: string;
+  textColor?: string;
+  bold?: boolean;
+  italic?: boolean;
+}
+
+export interface TableDataDTO {
+  columns: TableColumnDTO[];
+  items: TableRowDTO[];
+  groups?: TableColumnGroupDTO[];
+}
+
+// ============================================
+// Union type for all component data
+// ============================================
+
+export type ComponentDataDTO =
+  | LabelValueDataDTO
+  | BigIntDataDTO
+  | ActionButtonDataDTO
+  | TextDataDTO
+  | SectionDataDTO
+  | TitleDescriptionDataDTO
+  | OrderedDescriptionDataDTO
+  | BulletListDataDTO
+  | ArrowListDataDTO
+  | OrderedListDataDTO
+  | MarkerListDataDTO
+  | TableDataDTO
+  | Record<string, unknown>;
+
+// ============================================
+// Component Config DTO (Validation)
+// ============================================
+
+export interface ComponentConfigDTO extends MarginConfig {
   // Layout & Spacing
-  marginTop?: number;
-  marginBottom?: number;
-  marginLeft?: number;
-  marginRight?: number;
   width?: string;
   position?: 'left' | 'right' | 'center';
 

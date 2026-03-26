@@ -14,12 +14,17 @@ interface OrderedListTheme {
 
 interface OrderedListConfig {
   numberColor?: string;
+  numberBackgroundColor?: string;
   titleColor?: string;
   descriptionColor?: string;
-  textAlign?: 'left' | 'right' | 'center' | 'justify';
   titleFontSize?: number;
   descriptionFontSize?: number;
   numberFontSize?: number;
+  markerGap?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface OrderedListProps {
@@ -38,12 +43,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  content: {
-    flex: 1,
+  numberColumn: {
+    flexDirection: 'row',
   },
   number: {
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  content: {
+    flex: 1,
   },
   title: {
     fontSize: 8,
@@ -59,25 +67,38 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function OrderedList({ items, config, textAlign, theme }: OrderedListProps) {
-  const align = textAlign ?? config?.textAlign ?? 'left';
-  const titleFontSize = config?.titleFontSize ?? 8;
-  const descriptionFontSize = config?.descriptionFontSize ?? 8;
-  const numberFontSize = config?.numberFontSize ?? 10;
-
+export default function OrderedList({ items, config, textAlign = 'left', theme }: OrderedListProps) {
   const numberColor = config?.numberColor ?? theme?.primaryColor ?? '#FFCC00';
   const titleColor = config?.titleColor ?? theme?.textPrimary ?? '#4D4D4D';
   const descriptionColor = config?.descriptionColor ?? theme?.textSecondary ?? '#71717A';
+  const titleFontSize = config?.titleFontSize ?? 8;
+  const descriptionFontSize = config?.descriptionFontSize ?? 8;
+  const numberFontSize = config?.numberFontSize ?? 10;
+  const markerGap = config?.markerGap ?? 6;
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   return (
-    <View style={[styles.container, { textAlign: align }]}>
+    <View style={containerStyle}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
+          <View style={[styles.numberColumn, { marginRight: markerGap }]}>
+            <Text style={[styles.number, { color: numberColor, textAlign, fontSize: numberFontSize }]}>
+              {index + 1}.
+            </Text>
+          </View>
           <Text style={styles.content}>
-            <Text style={[styles.number, { color: numberColor }]}>{index + 1}. </Text>
-            <Text style={[styles.title, { color: titleColor }]}>{item.title}</Text>
-            <Text style={[styles.colon, { color: titleColor }]}>: </Text>
-            <Text style={[styles.description, { color: descriptionColor }]}>{item.description}</Text>
+            <Text style={[styles.title, { color: titleColor, textAlign, fontSize: titleFontSize }]}>{item.title}</Text>
+            <Text style={[styles.colon, { color: titleColor, textAlign, fontSize: titleFontSize }]}>: </Text>
+            <Text style={[styles.description, { color: descriptionColor, textAlign, fontSize: descriptionFontSize }]}>
+              {item.description}
+            </Text>
           </Text>
         </View>
       ))}

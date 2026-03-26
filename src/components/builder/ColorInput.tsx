@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 
 interface ColorInputProps {
   label: string;
@@ -31,16 +32,25 @@ export function ColorInput({ label, value, onChange, className = "", labelClass 
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-mono text-xs">#</span>
           <input 
             type="text" 
-            className="w-full bg-black/20 border border-white/10 text-slate-100 pl-6 pr-3 py-2 rounded text-sm outline-none transition-colors focus:border-blue-500 font-mono"
-            value={safeValue.replace('#', '')}
+            className="w-full bg-black/20 border border-white/10 text-slate-100 pl-6 pr-8 py-2 rounded text-sm outline-none transition-colors focus:border-blue-500 font-mono"
+            value={value ? value.replace('#', '') : ''}
             onChange={(e) => {
               const val = e.target.value;
               if (val.length <= 6) {
-                onChange(`#${val.toUpperCase()}`);
+                onChange(val ? `#${val.toUpperCase()}` : '');
               }
             }}
-            placeholder="000000"
+            placeholder="Padrão"
           />
+          {value && (
+            <button 
+              onClick={() => onChange('')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-red-400 p-1"
+              title="Limpar cor"
+            >
+              <X size={12} />
+            </button>
+          )}
         </div>
       </div>
     </div>

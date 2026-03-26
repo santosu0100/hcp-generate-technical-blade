@@ -14,10 +14,12 @@ import type {
   MarkerListConfig,
   BoxGroupConfig,
   TableConfig,
-  LabelValueData,
-  BigIntData,
-  ActionButtonData,
-  TextData,
+  ChartConfig,
+  ChartData,
+  LabelValueDataDTO,
+  BigIntDataDTO,
+  ActionButtonDataDTO,
+  TextDataDTO,
   SectionData,
   LinkData,
   TitleDescriptionData,
@@ -28,38 +30,25 @@ import type {
   MarkerListData,
   TableData,
   LabelValueVariant,
-  ComponentDTO,
-  ComponentConfigDTO,
-  ComponentType,
-} from '@/types/components.dto';
-
-// ============================================
-// Categories (Frontend Builder Specific)
-// ============================================
+} from '../../../types/components.dto';
 
 export const ComponentCategory = {
-  LAYOUT: 'Layout Estrutural',
-  COMPONENTS: 'Componentes Principais',
+  LAYOUT: 'LAYOUT',
+  COMPONENTS: 'COMPONENTS',
 } as const;
 
-export type ComponentCategory = typeof ComponentCategory[keyof typeof ComponentCategory];
-
-// ============================================
-// Types exported for the rest of the app
-// ============================================
-
-export type { ComponentDTO, ComponentType, ComponentTheme, BaseComponentDTO };
+export type ComponentCategory = (typeof ComponentCategory)[keyof typeof ComponentCategory];
 
 // ============================================
 // Render function types
 // ============================================
 
-export type RenderChildFn = (child: ComponentDTO) => ReactElement | null;
+export type RenderChildFn = (child: BaseComponentDTO) => ReactElement | null;
 
 export interface BaseRendererProps {
-  config?: ComponentConfigDTO;
+  config?: unknown;
   data?: unknown;
-  children?: ComponentDTO[];
+  children?: BaseComponentDTO[];
   theme?: ComponentTheme;
   renderChild: RenderChildFn;
 }
@@ -71,110 +60,113 @@ export type ComponentRendererFn = (props: BaseRendererProps) => ReactElement | n
 // ============================================
 
 export interface BrandRendererProps {
-  config?: BrandConfig & ComponentConfigDTO;
+  config?: BrandConfig;
 }
 
 export interface CardRendererProps {
-  children?: ComponentDTO[];
+  children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
   theme?: ComponentTheme;
-  config?: ComponentConfigDTO;
 }
 
 export interface LabelValueRendererProps {
-  data?: LabelValueData;
-  config?: ComponentConfigDTO & { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
+  data?: LabelValueDataDTO;
+  config?: { variant?: LabelValueVariant; textAlign?: 'left' | 'right' | 'center' | 'justify' };
   theme?: ComponentTheme;
 }
 
 export interface BigIntRendererProps {
-  data?: BigIntData;
-  config?: ComponentConfigDTO & { labelPosition?: 'before' | 'after'; fontSize?: number };
+  data?: BigIntDataDTO;
+  config?: { labelPosition?: 'before' | 'after'; fontSize?: number };
   theme?: ComponentTheme;
 }
 
 export interface ActionButtonRendererProps {
-  data?: ActionButtonData;
+  data?: ActionButtonDataDTO;
   theme?: ComponentTheme;
-  config?: ComponentConfigDTO;
 }
 
 export interface SidebarRendererProps {
-  config?: { width?: number | string } & ComponentConfigDTO;
-  children?: ComponentDTO[];
+  config?: { width?: number };
+  children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
 }
 
 export interface TextRendererProps {
-  data?: TextData;
-  config?: TextConfig & ComponentConfigDTO;
+  data?: TextDataDTO;
+  config?: TextConfig;
   theme?: ComponentTheme;
 }
 
 export interface SectionRendererProps {
   data?: SectionData;
-  config?: SectionConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
+  config?: SectionConfig;
+  children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
   theme?: ComponentTheme;
 }
 
 export interface FooterRendererProps {
-  children?: ComponentDTO[];
+  children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
-  config?: ComponentConfigDTO;
 }
 
 export interface LinkRendererProps {
   data?: LinkData;
-  config?: LinkConfig & ComponentConfigDTO;
+  config?: LinkConfig;
   theme?: ComponentTheme;
 }
 
 export interface TitleDescriptionRendererProps {
   data?: TitleDescriptionData;
-  config?: TitleDescriptionConfig & ComponentConfigDTO;
+  config?: TitleDescriptionConfig;
   theme?: ComponentTheme;
 }
 
 export interface OrderedDescriptionRendererProps {
   data?: OrderedDescriptionData;
-  config?: OrderedDescriptionConfig & ComponentConfigDTO;
+  config?: OrderedDescriptionConfig;
   theme?: ComponentTheme;
 }
 
 export interface BulletListRendererProps {
   data?: BulletListData;
-  config?: BulletListConfig & ComponentConfigDTO;
+  config?: BulletListConfig;
   theme?: ComponentTheme;
 }
 
 export interface ArrowListRendererProps {
   data?: ArrowListData;
-  config?: ArrowListConfig & ComponentConfigDTO;
+  config?: ArrowListConfig;
   theme?: ComponentTheme;
 }
 
 export interface OrderedListRendererProps {
   data?: OrderedListData;
-  config?: OrderedListConfig & ComponentConfigDTO;
+  config?: OrderedListConfig;
   theme?: ComponentTheme;
 }
 
 export interface MarkerListRendererProps {
   data?: MarkerListData;
-  config?: MarkerListConfig & ComponentConfigDTO;
+  config?: MarkerListConfig;
   theme?: ComponentTheme;
 }
 
 export interface TableRendererProps {
   data?: TableData;
-  config?: TableConfig & ComponentConfigDTO;
+  config?: TableConfig;
   theme?: ComponentTheme;
 }
 
 export interface BoxGroupRendererProps {
-  config?: BoxGroupConfig & ComponentConfigDTO;
-  children?: ComponentDTO[];
+  config?: BoxGroupConfig;
+  children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
+}
+
+export interface ChartRendererProps {
+  data?: ChartData;
+  config?: ChartConfig;
+  theme?: ComponentTheme;
 }

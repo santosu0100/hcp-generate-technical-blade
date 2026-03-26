@@ -19,8 +19,12 @@ interface BulletListConfig {
   labelColor?: string;
   valueColor?: string;
   variant?: BulletListVariant;
-  textAlign?: 'left' | 'right' | 'center' | 'justify';
   fontSize?: number;
+  markerGap?: number;
+  marginTop?: number;
+  marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
 }
 
 interface BulletListProps {
@@ -85,30 +89,52 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function BulletList({ items, config, textAlign, theme }: BulletListProps) {
+export default function BulletList({ items, config, textAlign = 'left', theme }: BulletListProps) {
   const variant = config?.variant ?? 'value-bolder';
   const isLabelBolder = variant === 'label-bolder';
-  const align = textAlign ?? config?.textAlign ?? 'left';
-  const fontSize = config?.fontSize ?? 8;
 
   const bulletColor =
     config?.bulletColor ?? (isLabelBolder ? theme?.primaryColor ?? '#1E3A5F' : theme?.textSecondary ?? '#71717A');
   const labelColor = config?.labelColor ?? theme?.textPrimary ?? '#4D4D4D';
   const valueColor = config?.valueColor ?? theme?.textSecondary ?? '#71717A';
+  const fontSize = config?.fontSize ?? 8;
+  const markerGap = config?.markerGap ?? 6;
+
+  const containerStyle = [
+    styles.container,
+    config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
+    config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
+    config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
+    config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+  ];
 
   return (
-    <View style={[styles.container, { textAlign: align }]}>
+    <View style={containerStyle}>
       {items.map((item, index) => (
         <View key={index} style={styles.item}>
-          <View style={styles.bulletContainer}>
+          <View style={[styles.bulletContainer, { width: 12 + markerGap }]}>
             <View style={[styles.bullet, { backgroundColor: bulletColor }]} />
           </View>
           <View style={styles.content}>
-            <Text style={[isLabelBolder ? styles.labelBold : styles.labelNormal, { color: labelColor }]}>
+            <Text
+              style={[
+                isLabelBolder ? styles.labelBold : styles.labelNormal,
+                { color: labelColor, textAlign, fontSize },
+              ]}>
               {item.label}
             </Text>
-            <Text style={[isLabelBolder ? styles.colonBold : styles.colonNormal, { color: labelColor }]}>: </Text>
-            <Text style={[isLabelBolder ? styles.valueNormal : styles.valueBold, { color: valueColor }]}>
+            <Text
+              style={[
+                isLabelBolder ? styles.colonBold : styles.colonNormal,
+                { color: labelColor, textAlign, fontSize },
+              ]}>
+              :{' '}
+            </Text>
+            <Text
+              style={[
+                isLabelBolder ? styles.valueNormal : styles.valueBold,
+                { color: valueColor, textAlign, fontSize },
+              ]}>
               {item.value}
             </Text>
           </View>

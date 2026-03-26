@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, Image } from '@react-pdf/renderer';
 import React, { ReactNode } from 'react';
+
+// Vite-friendly public path for logo
 const HURST_GRAY_LOGO = '/assets/originator-logo/hurst-gray-logo.png';
 
 interface FooterProps {
