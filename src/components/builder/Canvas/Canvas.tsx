@@ -5,10 +5,11 @@ import { PDFViewer } from '@react-pdf/renderer';
 import { CanvasTabs } from './CanvasTabs';
 import { ZoneDropArea } from './ZoneDropArea';
 import { JsonPayloadViewer } from './JsonPayloadViewer';
+import { JsonTemplateViewer } from './JsonTemplateViewer';
 
 export function Canvas() {
   const { rootComponents, getPayload } = usePdfBuilder();
-  const [activeTab, setActiveTab] = useState<'builder'|'preview'|'json'>('builder');
+  const [activeTab, setActiveTab] = useState<'builder'|'preview'|'json'|'template'>('builder');
 
   const payload = getPayload();
 
@@ -81,6 +82,10 @@ export function Canvas() {
 
         {activeTab === 'json' && (
           <JsonPayloadViewer payload={payload} />
+        )}
+
+        {activeTab === 'template' && (
+          <JsonTemplateViewer />
         )}
       </div>
     </div>

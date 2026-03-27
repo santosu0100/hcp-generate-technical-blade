@@ -7,10 +7,11 @@ interface ComponentFieldsProps {
   type: ComponentType;
   data: any;
   config: any;
+  dto?: any;
   onUpdateData: (data: any) => void;
   onUpdateConfig: (config: any) => void;
+  onUpdateDtoRoot?: (changes: any) => void;
   onOpenTableEditor?: () => void;
-  onOpenChartEditor?: () => void;
 }
 
 /**
@@ -35,7 +36,23 @@ function MarginFields({ config, onUpdateConfig }: { config: any, onUpdateConfig:
   );
 }
 
-export function ComponentFields({ type, data, config, onUpdateData, onUpdateConfig, onOpenTableEditor, onOpenChartEditor }: ComponentFieldsProps) {
+function TemplateFields({ dto, onUpdateDtoRoot }: { dto: any, onUpdateDtoRoot: (newDto: any) => void }) {
+  return (
+    <PropertySection title="Configurações de Template" icon={<Edit3 size={14}/>}>
+      <PropertyField 
+        label="Chave Customizada (Template)" 
+        value={dto.internal_templateKey} 
+        onChange={(val) => onUpdateDtoRoot({ internal_templateKey: val })} 
+        placeholder="Ex: NOME_DO_CAMPO"
+      />
+      <p className="text-[10px] text-slate-500 italic mt-1 px-1">
+        Define uma identificação personalizada para este componente no JSON Template.
+      </p>
+    </PropertySection>
+  );
+}
+
+export function ComponentFields({ type, data, config, dto, onUpdateData, onUpdateConfig, onUpdateDtoRoot, onOpenTableEditor }: ComponentFieldsProps) {
   if (type === 'page-break') {
     return (
       <div className="p-4 text-center text-slate-400 text-sm bg-white/5 rounded-xl border border-white/5 font-medium">
@@ -137,7 +154,8 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 onUpdate={(items) => onUpdateData({ ...data, items })}
                 fields={[
                   { name: 'label', label: 'Rótulo', placeholder: 'Ex: Taxa' },
-                  { name: 'value', label: 'Valor', placeholder: 'Ex: 10%' }
+                  { name: 'value', label: 'Valor', placeholder: 'Ex: 10%' },
+                  { name: 'internal_templateKey', label: 'Chave Template', placeholder: 'Ex: TAXA' }
                 ]}
                 addButtonLabel="Novo Item"
               />
@@ -147,7 +165,8 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 onUpdate={(links) => onUpdateData({ ...data, links })}
                 fields={[
                   { name: 'label', label: 'Texto do Link', placeholder: 'Ver detalhes...' },
-                  { name: 'href', label: 'URL / Link', placeholder: 'https://...' }
+                  { name: 'href', label: 'URL / Link', placeholder: 'https://...' },
+                  { name: 'internal_templateKey', label: 'Chave Template', placeholder: 'Ex: LINK' }
                 ]}
                 addButtonLabel="Novo Link"
               />
@@ -237,13 +256,14 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 title="Itens da Lista"
                 items={data.items || []}
                 onUpdate={(items) => onUpdateData({ items })}
-                fields={
-                  type === 'bullet-list' 
+                fields={[
+                  ...(type === 'bullet-list' 
                     ? [{ name: 'label', label: 'Rótulo' }, { name: 'value', label: 'Valor' }]
                     : type === 'marker-list'
                       ? [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }, { name: 'icon', label: 'Ícone (Opcional)' }]
-                      : [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }]
-                }
+                      : [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }]),
+                  { name: 'internal_templateKey', label: 'Chave Template', placeholder: 'Ex: ITEM_ID' }
+                ] as any}
                 addButtonLabel="Novo Item"
               />
 
@@ -313,7 +333,8 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 onUpdate={(items) => onUpdateData({ items })}
                 fields={[
                   { name: 'title', label: 'Título' },
-                  { name: 'description', label: 'Descrição', type: 'textarea' }
+                  { name: 'description', label: 'Descrição', type: 'textarea' },
+                  { name: 'internal_templateKey', label: 'Chave Template', placeholder: 'Ex: ITEM_ID' }
                 ]}
                 addButtonLabel="Novo Item"
               />
@@ -395,26 +416,6 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
           </PropertySection>
         );
 
-      case 'chart':
-        return (
-          <div className="space-y-6">
-            <PropertySection title="Configurações Básicas" icon={<Settings size={14}/>}>
-              <div className="space-y-4">
-                <PropertyField label="Largura (%)" value={config.widthPercent} onChange={(val) => onUpdateConfig({ widthPercent: val })} placeholder="100%" />
-                <PropertyField label="Altura Display" value={config.displayHeight} onChange={(val) => onUpdateConfig({ displayHeight: val })} type="number" placeholder="200" />
-              </div>
-            </PropertySection>
-
-            <div className="mb-8">
-              <button 
-                onClick={onOpenChartEditor}
-                className="w-full flex items-center justify-center gap-2 py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-indigo-500/20 active:scale-95"
-              >
-                <Edit3 size={18} /> 📈 Abrir Editor de Gráfico
-              </button>
-            </div>
-          </div>
-        );
 
       case 'image-view':
         return (
@@ -465,6 +466,7 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
   return (
     <div className="space-y-4">
       {renderComponentSpecificFields()}
+      <TemplateFields dto={dto || data} onUpdateDtoRoot={onUpdateDtoRoot || onUpdateData} />
       <MarginFields config={config} onUpdateConfig={onUpdateConfig} />
     </div>
   );

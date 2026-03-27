@@ -14,8 +14,6 @@ import type {
   MarkerListConfig,
   BoxGroupConfig,
   TableConfig,
-  ChartConfig,
-  ChartData,
   ImageViewConfig,
   ImageViewData,
   LabelValueDataDTO,
@@ -175,11 +173,6 @@ export interface BoxGroupRendererProps {
   renderChild: RenderChildFn;
 }
 
-export interface ChartRendererProps {
-  data?: ChartData;
-  config?: ChartConfig;
-  theme?: ComponentTheme;
-}
 
 export interface ImageViewRendererProps {
   data?: ImageViewData;

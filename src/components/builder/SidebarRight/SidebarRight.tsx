@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { usePdfBuilder } from '@/context/PdfBuilderContext';
 import { Trash2, Settings } from 'lucide-react';
 import { TableEditorModal } from '../TableEditor/TableEditorModal';
-import { ChartEditorModal } from '../ChartEditor/ChartEditorModal';
 import { ComponentHeader } from './ComponentHeader';
 import { OriginatorSelector } from './OriginatorSelector';
 import { LayoutSettings } from './LayoutSettings';
@@ -11,7 +10,6 @@ import { ComponentFields } from './ComponentFields';
 export function SidebarRight() {
   const { rootComponents, selectedComponentId, updateComponent, removeComponent, originator, setOriginator } = usePdfBuilder();
   const [isTableModalOpen, setIsTableModalOpen] = useState(false);
-  const [isChartModalOpen, setIsChartModalOpen] = useState(false);
 
   // Encontrar o componente atual na árvore
   const findComponent = (nodes: any[], id: string): any => {
@@ -72,15 +70,16 @@ export function SidebarRight() {
       {type !== 'page-break' && (
         <OriginatorSelector value={originator} onChange={setOriginator} />
       )}
-
+ 
       <ComponentFields 
         type={type} 
         data={data} 
         config={config} 
+        dto={dto}
         onUpdateData={updateData} 
         onUpdateConfig={updateConfig}
+        onUpdateDtoRoot={(changes) => updateComponent(component.id, changes)}
         onOpenTableEditor={() => setIsTableModalOpen(true)}
-        onOpenChartEditor={() => setIsChartModalOpen(true)}
       />
 
       {(showGrid || showAlignment) && (
@@ -117,12 +116,6 @@ export function SidebarRight() {
         />
       )}
 
-      {isChartModalOpen && (
-        <ChartEditorModal 
-          componentId={component.id} 
-          onClose={() => setIsChartModalOpen(false)} 
-        />
-      )}
     </div>
   );
 }

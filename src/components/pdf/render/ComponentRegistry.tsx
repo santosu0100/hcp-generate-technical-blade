@@ -17,7 +17,6 @@ import OrderedList from '../OrderedList';
 import MarkerList from '../MarkerList';
 import Table from '../Table';
 import BoxGroup from '../BoxGroup';
-import Chart from '../Chart';
 import ImageView from '../ImageView';
 import type {
   BrandRendererProps,
@@ -38,7 +37,6 @@ import type {
   MarkerListRendererProps,
   TableRendererProps,
   BoxGroupRendererProps,
-  ChartRendererProps,
   ImageViewRendererProps,
 } from './types';
 
@@ -157,7 +155,6 @@ export const componentRenderers = {
     </BoxGroup>
   ),
 
-  chart: ({ data, config, theme }: ChartRendererProps) => <Chart data={data!} config={config!} theme={theme} />,
 
   'image-view': ({ data, config, theme }: ImageViewRendererProps) => (
     <ImageView data={data} config={config} theme={theme} />

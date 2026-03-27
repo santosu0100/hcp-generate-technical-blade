@@ -27,7 +27,6 @@ export type ComponentType =
   | 'marker-list'
   | 'table'
   | 'box-group'
-  | 'chart'
   | 'image-view';
 
 // ============================================
@@ -158,74 +157,6 @@ export interface BoxGroupConfig extends MarginConfig {
   gapY?: number;
 }
 
-// ============================================
-// Chart Types
-// ============================================
-
-export type ChartType = 'bar' | 'line' | 'pie' | 'doughnut' | 'radar' | 'polarArea';
-
-export interface ChartDataset {
-  label: string;
-  data: number[];
-  type?: 'bar' | 'line';
-  backgroundColor?: string | string[];
-  borderColor?: string;
-  borderWidth?: number;
-  yAxisID?: string;
-  /** Line chart options */
-  fill?: boolean;
-  tension?: number;
-  pointRadius?: number;
-  borderDash?: number[];
-}
-
-export interface ChartAxisConfig {
-  display?: boolean;
-  title?: string;
-  min?: number;
-  max?: number;
-  position?: 'left' | 'right';
-}
-
-export interface ChartOptions {
-  title?: string;
-  titleColor?: string;
-  titleFontSize?: number;
-  legendDisplay?: boolean;
-  legendFontSize?: number;
-  tickFontSize?: number;
-  /** Show/hide X axis line and labels */
-  xAxisDisplay?: boolean;
-  /** Show/hide Y axis line and labels */
-  yAxisDisplay?: boolean;
-  /** Show/hide all grid lines (backward compatibility) */
-  gridDisplay?: boolean;
-  /** Show/hide vertical grid lines (X axis) */
-  gridXDisplay?: boolean;
-  /** Show/hide horizontal grid lines (Y axis) */
-  gridYDisplay?: boolean;
-  gridColor?: string;
-  /** Left Y-axis config */
-  yAxis?: ChartAxisConfig;
-  /** Right Y-axis config (for dual-axis charts) */
-  yAxis1?: ChartAxisConfig;
-}
-
-export interface ChartConfig extends MarginConfig {
-  type: ChartType;
-  width?: number;
-  height?: number;
-  /** Use percentage-based width for responsive sizing (e.g., '100%') */
-  widthPercent?: string;
-  /** Fixed height in points for PDF display */
-  displayHeight?: number;
-  options?: ChartOptions;
-}
-
-export interface ChartData {
-  labels: string[];
-  datasets: ChartDataset[];
-}
 
 // ============================================
 // Image View Component
@@ -504,11 +435,6 @@ export interface BoxGroupComponentDTO {
   children?: BaseComponentDTO[];
 }
 
-export interface ChartComponentDTO {
-  type: 'chart';
-  data?: ChartData;
-  config?: ChartConfig;
-}
 
 export type ComponentDTO =
   | BrandComponentDTO
@@ -530,7 +456,6 @@ export type ComponentDTO =
   | MarkerListComponentDTO
   | TableComponentDTO
   | BoxGroupComponentDTO
-  | ChartComponentDTO
   | ImageViewComponentDTO;
 
 // ============================================
@@ -674,8 +599,7 @@ export type ComponentDataDTO =
   | OrderedListDataDTO
   | MarkerListDataDTO
   | TableDataDTO
-  | ImageViewData
-  | ChartData;
+  | ImageViewData;
 
 // ============================================
 // Component Config DTO (Validation)

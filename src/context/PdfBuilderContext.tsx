@@ -153,6 +153,8 @@ function prunePayload(obj: any): any {
   if (obj !== null && typeof obj === 'object') {
     const pruned: any = {};
     for (const [key, value] of Object.entries(obj)) {
+      if (key.startsWith('internal_')) continue;
+
       if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
         if (typeof value === 'object') {
           const nested = prunePayload(value);
