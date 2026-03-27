@@ -1,8 +1,6 @@
 import { StyleSheet, Text, View, Image } from '@react-pdf/renderer';
 import React, { ReactNode } from 'react';
-
-// Vite-friendly public path for logo
-const HURST_GRAY_LOGO = '/assets/originator-logo/hurst-gray-logo.png';
+import hurstGrayLogo from '@/assets/hurst-gray-logo.png';
 
 interface FooterProps {
   children?: ReactNode;
@@ -44,7 +42,7 @@ export default function Footer({ children }: FooterProps) {
   return (
     <View style={styles.footer} fixed>
       <View style={styles.leftContent}>
-        <Image src={HURST_GRAY_LOGO} style={styles.logo} />
+        <Image src={hurstGrayLogo} style={styles.logo} />
         {children && <Text style={styles.separator}>|</Text>}
         {children && <View style={styles.childrenContainer}>{children}</View>}
       </View>

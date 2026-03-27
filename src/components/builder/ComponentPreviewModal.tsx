@@ -65,7 +65,7 @@ export function ComponentPreviewModal({ type, onClose }: Props) {
   // Force layout wrappers if needed so it doesn't break
   const isLayoutType = ['brand', 'sidebar', 'footer'].includes(type);
   const getPayload = () => {
-     let rootComponents = [];
+     const rootComponents = [];
      if (isLayoutType) {
          rootComponents.push({ type, data: getDummyData(type), config: { position: 'left' }, children: getDummyChildren(type) });
          // add a dummy section so the page isn't empty otherwise sidebar takes no height

@@ -27,18 +27,20 @@ export type ComponentType =
   | 'marker-list'
   | 'table'
   | 'box-group'
-  | 'chart';
+  | 'chart'
+  | 'image-view';
 
 // ============================================
 // Component Config Types
 // ============================================
 
-/** Base margin config for all components */
 export interface MarginConfig {
   marginTop?: number;
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 export interface BrandConfig extends MarginConfig {
@@ -64,6 +66,8 @@ export interface SectionConfig extends MarginConfig {
   itemsPerRow?: number;
   gapX?: number;
   gapY?: number;
+  /** When true, all children have equal width. When false, children flex based on content. Default: true */
+  equalWidth?: boolean;
 }
 
 export interface LinkConfig extends MarginConfig {
@@ -77,6 +81,13 @@ export interface TitleDescriptionConfig extends MarginConfig {
   textAlign?: 'left' | 'right' | 'center' | 'justify';
   titleFontSize?: number;
   descriptionFontSize?: number;
+  // Bullet list styling (when items are provided)
+  bulletColor?: string;
+  labelColor?: string;
+  valueColor?: string;
+  bulletFontSize?: number;
+  gap?: number;
+  markerGap?: number;
 }
 
 export interface OrderedDescriptionConfig extends MarginConfig {
@@ -131,6 +142,8 @@ export interface MarkerListConfig extends MarginConfig {
   titleColor?: string;
   descriptionColor?: string;
   textAlign?: 'left' | 'right' | 'center' | 'justify';
+  /** Enable snake lines connecting items */
+  snakeLines?: boolean;
   titleFontSize?: number;
   descriptionFontSize?: number;
   numberColor?: string;
@@ -214,6 +227,31 @@ export interface ChartData {
   datasets: ChartDataset[];
 }
 
+// ============================================
+// Image View Component
+// ============================================
+
+export interface ImageViewConfig extends MarginConfig {
+  width?: number;
+  height?: number;
+  objectFit?: 'contain' | 'cover' | 'fill' | 'none';
+  alignment?: 'left' | 'center' | 'right';
+}
+
+export interface ImageViewData {
+  src: string;
+}
+
+export interface ImageViewComponentDTO extends BaseComponentDTO {
+  type: 'image-view';
+  data?: ImageViewData;
+  config?: ImageViewConfig;
+}
+
+export interface ImageViewTheme {
+  primaryColor?: string;
+}
+
 export interface TableColumnConfig {
   key: string;
   label: string;
@@ -286,8 +324,12 @@ export interface LinkData {
 
 export interface TitleDescriptionData {
   title: string;
-  description: string;
+  description?: string;
   links?: { label: string; href: string }[];
+  items?: {
+    label: string;
+    value: string;
+  }[];
 }
 
 export interface OrderedDescriptionData {
@@ -323,6 +365,7 @@ export interface MarkerListData {
   items: {
     title: string;
     description: string;
+    icon?: string;
   }[];
 }
 
@@ -342,8 +385,8 @@ export interface SectionData {
 
 export interface BaseComponentDTO {
   type: ComponentType;
-  config?: unknown;
-  data?: unknown;
+  config?: ComponentConfigDTO;
+  data?: ComponentDataDTO;
   children?: BaseComponentDTO[];
 }
 
@@ -487,7 +530,8 @@ export type ComponentDTO =
   | MarkerListComponentDTO
   | TableComponentDTO
   | BoxGroupComponentDTO
-  | ChartComponentDTO;
+  | ChartComponentDTO
+  | ImageViewComponentDTO;
 
 // ============================================
 // Component Data DTOs (Validation)
@@ -518,8 +562,12 @@ export interface SectionDataDTO {
 
 export interface TitleDescriptionDataDTO {
   title: string;
-  description: string;
+  description?: string;
   links?: { label: string; href: string }[];
+  items?: {
+    label: string;
+    value: string;
+  }[];
 }
 
 export interface OrderedDescriptionDataDTO {
@@ -555,6 +603,7 @@ export interface MarkerListDataDTO {
   items: {
     title: string;
     description: string;
+    icon?: string;
   }[];
 }
 
@@ -625,7 +674,8 @@ export type ComponentDataDTO =
   | OrderedListDataDTO
   | MarkerListDataDTO
   | TableDataDTO
-  | Record<string, unknown>;
+  | ImageViewData
+  | ChartData;
 
 // ============================================
 // Component Config DTO (Validation)
@@ -633,7 +683,7 @@ export type ComponentDataDTO =
 
 export interface ComponentConfigDTO extends MarginConfig {
   // Layout & Spacing
-  width?: string;
+  width?: number | string;
   position?: 'left' | 'right' | 'center';
 
   // Text alignment
@@ -684,6 +734,25 @@ export interface ComponentConfigDTO extends MarginConfig {
   cellSpacingY?: number;
   cellPaddingY?: number;
   rowFontSize?: number;
+
+  // Additional props
+  bulletColor?: string;
+  labelColor?: string;
+  valueColor?: string;
+  bulletFontSize?: number;
+  gap?: number;
+  markerGap?: number;
+  snakeLines?: boolean;
+  objectFit?: 'contain' | 'cover' | 'fill' | 'none';
+  equalWidth?: boolean;
+  numberColor?: string;
+  numberFontSize?: number;
+  circleColor?: string;
+  circleBackgroundColor?: string;
+  lineColor?: string;
+  markerSize?: number;
+  markerColor?: string;
+  arrowColor?: string;
 }
 
 export type ComponentTheme = ComponentThemeConfig;

@@ -2,7 +2,7 @@ import React from 'react';
 import { Document, Page, StyleSheet, Font } from '@react-pdf/renderer';
 import { OperationTechnicalBladeDTO } from '@/types/operation-technical-blade.dto';
 import type { ComponentDTO } from '@/types/components.dto';
-import PageLayout from '@/components/pdf/PageLayout';
+import PageLayout from '../PageLayout';
 import { DEFAULT_ORIGINATOR } from '@/utils/originators';
 import '@/utils/fonts'; // Registrar fonte Poppins globalmente
 
@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins',
     color: '#4A4A4A',
     paddingTop: 35,
-    paddingBottom: 50,
+    paddingBottom: 35,
     paddingHorizontal: 20,
   },
 });

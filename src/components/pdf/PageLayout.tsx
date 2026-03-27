@@ -1,6 +1,6 @@
 import { StyleSheet, View } from '@react-pdf/renderer';
 import React from 'react';
-import type { ComponentDTO, SidebarComponentDTO, FooterComponentDTO } from '@/types/components.dto';
+import type { ComponentDTO, SidebarComponentDTO, FooterComponentDTO } from '../../types/components.dto';
 import { ComponentRenderer } from './render/ComponentRenderer';
 import type { ComponentRendererContext } from './render/ComponentRenderer';
 import Sidebar from './Sidebar';

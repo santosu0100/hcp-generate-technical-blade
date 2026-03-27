@@ -11,6 +11,8 @@ interface BoxGroupProps {
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 const styles = StyleSheet.create({
@@ -34,6 +36,8 @@ export default function BoxGroup({
   marginBottom,
   marginLeft,
   marginRight,
+  width,
+  height,
 }: BoxGroupProps) {
   const isRow = layout === 'row';
   const effectiveGapX = gapX ?? 0;
@@ -48,13 +52,15 @@ export default function BoxGroup({
     calculatedWidth = `${Math.max(0, availableWidth / itemsPerRow)}%`;
   }
 
-  const containerStyle = {
-    ...(isRow ? styles.row : styles.column),
-    ...(marginTop !== undefined && { marginTop }),
-    ...(marginBottom !== undefined && { marginBottom }),
-    ...(marginLeft !== undefined && { marginLeft }),
-    ...(marginRight !== undefined && { marginRight }),
-  };
+  const containerStyle = [
+    isRow ? styles.row : styles.column,
+    marginTop !== undefined ? { marginTop } : {},
+    marginBottom !== undefined ? { marginBottom } : {},
+    marginLeft !== undefined ? { marginLeft } : {},
+    marginRight !== undefined ? { marginRight } : {},
+    width !== undefined ? { width } : {},
+    height !== undefined ? { height } : {},
+  ];
 
   const getChildStyle = (index: number) => {
     const isLastInRow = isRow && itemsPerRow && (index + 1) % itemsPerRow === 0;

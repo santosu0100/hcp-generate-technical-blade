@@ -1,9 +1,7 @@
-import { FileText, Settings, List, Edit3, Columns, Maximize2, MoveVertical } from 'lucide-react';
+import { FileText, Settings, List, Edit3, Columns, Maximize2, MoveVertical, Plus, Link as LinkIcon, Trash2 } from 'lucide-react';
 import { PropertySection, PropertyField } from './PropertyBase';
 import { ComponentType } from '@/types/components.dto';
 import { ListItemEditor } from './ListItemEditor';
-
-import { Plus, Link as LinkIcon, Trash2 } from 'lucide-react';
 
 interface ComponentFieldsProps {
   type: ComponentType;
@@ -29,6 +27,10 @@ function MarginFields({ config, onUpdateConfig }: { config: any, onUpdateConfig:
         <PropertyField label="Margem Esquerda" value={config.marginLeft} onChange={(val) => onUpdateConfig({ marginLeft: val })} type="number" placeholder="0" />
         <PropertyField label="Margem Direita" value={config.marginRight} onChange={(val) => onUpdateConfig({ marginRight: val })} type="number" placeholder="0" />
       </div>
+      <div className="mt-2 grid grid-cols-2 gap-4">
+        <PropertyField label="Largura Fixo" value={config.width} onChange={(val) => onUpdateConfig({ width: val })} placeholder="auto" />
+        <PropertyField label="Altura Fixa" value={config.height} onChange={(val) => onUpdateConfig({ height: val })} placeholder="auto" />
+      </div>
     </PropertySection>
   );
 }
@@ -52,6 +54,23 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                <PropertyField label="Fonte" value={config.fontSize} onChange={(val) => onUpdateConfig({ fontSize: val })} type="number" placeholder="10" />
                <PropertyField label="Cor" value={config.color} onChange={(val) => onUpdateConfig({ color: val })} type="color" />
             </div>
+            <div className="mt-2">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Peso da Fonte</label>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => onUpdateConfig({ fontWeight: 'normal' })}
+                  className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.fontWeight !== 'bold' ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+                >
+                  NORMAL
+                </button>
+                <button 
+                  onClick={() => onUpdateConfig({ fontWeight: 'bold' })}
+                  className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.fontWeight === 'bold' ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+                >
+                  NEGRITO
+                </button>
+              </div>
+            </div>
           </PropertySection>
         );
 
@@ -70,11 +89,38 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
           </PropertySection>
         );
 
+      case 'brand':
+        return (
+          <PropertySection title="Configurações do Logo" icon={<Settings size={14}/>}>
+            <PropertyField label="Originadora (Opcional)" value={config.originator} onChange={(val) => onUpdateConfig({ originator: val })} placeholder="Ex: hurst" />
+            <div className="mt-4">
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Alinhamento</label>
+              <div className="flex gap-2">
+                {['left', 'center', 'right'].map((align) => (
+                  <button 
+                    key={align}
+                    onClick={() => onUpdateConfig({ alignment: align })}
+                    className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.alignment === align ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+                  >
+                    {align.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </PropertySection>
+        );
+
       case 'section':
         return (
-          <PropertySection title="Configurações do Título" icon={<Settings size={14}/>}>
+          <PropertySection title="Configurações da Seção" icon={<Settings size={14}/>}>
             <PropertyField label="Título da Seção" value={data.title} onChange={(val) => onUpdateData({ title: val })} />
             <PropertyField label="Cor do Título" value={config.titleColor} onChange={(val) => onUpdateConfig({ titleColor: val })} type="color" />
+            <div className="pt-2">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
+                <input type="checkbox" checked={config.equalWidth !== false} onChange={(e) => onUpdateConfig({ equalWidth: e.target.checked })} className="rounded bg-white/10 border-white/20 text-blue-500 focus:ring-blue-500/50" />
+                Filhos com mesma largura (Row)
+              </label>
+            </div>
           </PropertySection>
         );
 
@@ -82,9 +128,19 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
         return (
           <PropertySection title="Conteúdo" icon={<FileText size={14}/>}>
             <PropertyField label="Título" value={data.title} onChange={(val) => onUpdateData({ title: val })} />
-            <PropertyField label="Descrição" value={data.description} onChange={(val) => onUpdateData({ description: val })} />
+            <PropertyField label="Descrição" value={data.description} onChange={(val) => onUpdateData({ description: val })} type="textarea" />
             
-            <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
+              <ListItemEditor 
+                title="Lista de Tópicos (Key-Value)"
+                items={data.items || []}
+                onUpdate={(items) => onUpdateData({ ...data, items })}
+                fields={[
+                  { name: 'label', label: 'Rótulo', placeholder: 'Ex: Taxa' },
+                  { name: 'value', label: 'Valor', placeholder: 'Ex: 10%' }
+                ]}
+                addButtonLabel="Novo Item"
+              />
               <ListItemEditor 
                 title="Links Relacionados"
                 items={data.links || []}
@@ -97,16 +153,32 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
               />
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <PropertyField label="Fonte Título" value={config.titleFontSize} onChange={(val) => onUpdateConfig({ titleFontSize: val })} type="number" placeholder="18" />
-              <PropertyField label="Fonte Desc." value={config.descriptionFontSize} onChange={(val) => onUpdateConfig({ descriptionFontSize: val })} type="number" placeholder="11" />
-            </div>
+            <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <PropertyField label="Fonte Título" value={config.titleFontSize} onChange={(val) => onUpdateConfig({ titleFontSize: val })} type="number" placeholder="18" />
+                <PropertyField label="Fonte Desc." value={config.descriptionFontSize} onChange={(val) => onUpdateConfig({ descriptionFontSize: val })} type="number" placeholder="11" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <PropertyField label="Cor Título" value={config.titleColor} onChange={(val) => onUpdateConfig({ titleColor: val })} type="color" />
+                <PropertyField label="Cor Desc." value={config.descriptionColor} onChange={(val) => onUpdateConfig({ descriptionColor: val })} type="color" />
+              </div>
+              
+              <div className="pt-2 grid grid-cols-2 gap-4">
+                <PropertyField label="Espaç. Texto (Gap)" value={config.gap} onChange={(val) => onUpdateConfig({ gap: val })} type="number" placeholder="4" />
+                <PropertyField label="Espaç. Lista" value={config.markerGap} onChange={(val) => onUpdateConfig({ markerGap: val })} type="number" placeholder="8" />
+              </div>
 
-            <div className="mt-2 grid grid-cols-2 gap-4">
-              <PropertyField label="Cor Título" value={config.titleColor} onChange={(val) => onUpdateConfig({ titleColor: val })} type="color" />
-              <PropertyField label="Cor Desc." value={config.descriptionColor} onChange={(val) => onUpdateConfig({ descriptionColor: val })} type="color" />
+              <div className="pt-2 grid grid-cols-2 gap-4">
+                <PropertyField label="Fonte Tópicos" value={config.bulletFontSize} onChange={(val) => onUpdateConfig({ bulletFontSize: val })} type="number" placeholder="10" />
+                <PropertyField label="Cor Link" value={config.linkColor} onChange={(val) => onUpdateConfig({ linkColor: val })} type="color" />
+              </div>
+
+              <div className="pt-2 grid grid-cols-2 gap-4">
+                 <PropertyField label="Cor Bullet" value={config.bulletColor} onChange={(val) => onUpdateConfig({ bulletColor: val })} type="color" />
+                 <PropertyField label="Cor Rótulo (Lista)" value={config.labelColor} onChange={(val) => onUpdateConfig({ labelColor: val })} type="color" />
+              </div>
+              <PropertyField label="Cor Valor (Lista)" value={config.valueColor} onChange={(val) => onUpdateConfig({ valueColor: val })} type="color" />
             </div>
-            <PropertyField label="Cor Link" value={config.linkColor} onChange={(val) => onUpdateConfig({ linkColor: val })} type="color" />
           </PropertySection>
         );
 
@@ -168,7 +240,9 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                 fields={
                   type === 'bullet-list' 
                     ? [{ name: 'label', label: 'Rótulo' }, { name: 'value', label: 'Valor' }]
-                    : [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }]
+                    : type === 'marker-list'
+                      ? [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }, { name: 'icon', label: 'Ícone (Opcional)' }]
+                      : [{ name: 'title', label: 'Título' }, { name: 'description', label: 'Descrição', type: 'textarea' }]
                 }
                 addButtonLabel="Novo Item"
               />
@@ -195,11 +269,20 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
                    <PropertyField label="Cor Linha" value={config.lineColor} onChange={(val) => onUpdateConfig({ lineColor: val })} type="color" />
                 )}
               </div>
+              
+              {type === 'marker-list' && (
+                <div className="pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
+                    <input type="checkbox" checked={config.snakeLines === true} onChange={(e) => onUpdateConfig({ snakeLines: e.target.checked })} className="rounded bg-white/10 border-white/20 text-blue-500 focus:ring-blue-500/50" />
+                    Habilitar Linhas Conexas (Snake-Lines)
+                  </label>
+                </div>
+              )}
 
               {type === 'bullet-list' && (
                 <div className="pt-2 grid grid-cols-2 gap-4">
-                  <PropertyField label="Cor Valor" value={config.valueColor} onChange={(val) => onUpdateConfig({ valueColor: val })} type="color" />
-                  <PropertyField label="Cor Bullet" value={config.bulletColor} onChange={(val) => onUpdateConfig({ bulletColor: val })} type="color" />
+                   <PropertyField label="Cor Valor" value={config.valueColor} onChange={(val) => onUpdateConfig({ valueColor: val })} type="color" />
+                   <PropertyField label="Cor Bullet" value={config.bulletColor} onChange={(val) => onUpdateConfig({ bulletColor: val })} type="color" />
                 </div>
               )}
 
@@ -331,6 +414,47 @@ export function ComponentFields({ type, data, config, onUpdateData, onUpdateConf
               </button>
             </div>
           </div>
+        );
+
+      case 'image-view':
+        return (
+          <PropertySection title="Configurações da Imagem" icon={<FileText size={14}/>}>
+            <PropertyField label="URL da Imagem (src)" value={data.src} onChange={(val) => onUpdateData({ src: val })} placeholder="https://..." />
+            
+            <div className="mt-4 pt-4 border-t border-white/5 space-y-4">
+              <PropertyField label="Largura" value={config.width} onChange={(val) => onUpdateConfig({ width: val })} placeholder="ex: 100%, 200px" />
+              <PropertyField label="Altura" value={config.height} onChange={(val) => onUpdateConfig({ height: val })} placeholder="ex: auto, 150px" />
+              
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Ajuste (Object Fit)</label>
+                <select 
+                  className="w-full bg-white/5 border border-white/10 rounded-md px-3 py-2 text-white text-sm outline-none focus:border-blue-500"
+                  value={config.objectFit || 'contain'} 
+                  onChange={e => onUpdateConfig({ objectFit: e.target.value })}
+                >
+                  <option value="contain" className="bg-slate-800">Conter (Contain)</option>
+                  <option value="cover" className="bg-slate-800">Preencher (Cover)</option>
+                  <option value="fill" className="bg-slate-800">Esticar (Fill)</option>
+                  <option value="none" className="bg-slate-800">Nenhum</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">Alinhamento</label>
+                <div className="flex gap-2">
+                  {['left', 'center', 'right'].map((align) => (
+                    <button 
+                      key={align}
+                      onClick={() => onUpdateConfig({ alignment: align })}
+                      className={`flex-1 py-2 rounded-lg text-[10px] font-bold border transition-all ${config.alignment === align ? 'bg-blue-500 border-blue-400 text-white shadow-md' : 'bg-white/10 border-white/5 text-slate-500'}`}
+                    >
+                      {align.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </PropertySection>
         );
 
       default:

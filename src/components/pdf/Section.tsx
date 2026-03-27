@@ -10,10 +10,13 @@ interface SectionProps {
   itemsPerRow?: number;
   gapX?: number;
   gapY?: number;
+  equalWidth?: boolean;
   marginTop?: number;
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
   children?: ReactNode;
 }
 
@@ -45,10 +48,13 @@ export default function Section({
   itemsPerRow,
   gapX = 0,
   gapY = 0,
+  equalWidth = false,
   marginTop,
   marginBottom,
   marginLeft,
   marginRight,
+  width,
+  height,
   children,
 }: SectionProps) {
   const resolvedTitleColor = titleColor ?? theme?.titleColor ?? '#212121';
@@ -56,14 +62,12 @@ export default function Section({
   const effectiveGapX = gapX ?? 8;
   const effectiveGapY = gapY ?? 8;
 
-  // Calculate width considering gaps when in row layout
-  // Using a simpler approach: subtract gap from width percentage
+  // Calculate width considering gaps when in row layout and equalWidth is true
   let calculatedWidth: string | number = '100%';
-  if (isRow && itemsPerRow) {
-    // Each item gets 1/itemsPerRow of the width minus gaps
+  if (isRow && equalWidth && itemsPerRow) {
     const gapCount = itemsPerRow - 1;
     const gapSpace = gapCount * effectiveGapX;
-    const availableWidth = 100 - (gapSpace > 0 ? (gapSpace / 400) * 100 : 0); // Approximate gap as percentage
+    const availableWidth = 100 - (gapSpace > 0 ? (gapSpace / 400) * 100 : 0);
     calculatedWidth = `${Math.max(0, availableWidth / itemsPerRow)}%`;
   }
 
@@ -73,12 +77,23 @@ export default function Section({
     ...(marginBottom !== undefined && { marginBottom }),
     ...(marginLeft !== undefined && { marginLeft }),
     ...(marginRight !== undefined && { marginRight }),
+    ...(width !== undefined && { width }),
+    ...(height !== undefined && { height }),
   };
 
   const contentStyle = [styles.content, isRow ? styles.row : styles.column];
 
   const getChildStyle = (index: number) => {
     const isLastInRow = isRow && itemsPerRow && (index + 1) % itemsPerRow === 0;
+
+    // When equalWidth is false, let children use their natural content size
+    if (isRow && !equalWidth) {
+      return {
+        alignSelf: 'flex-start' as const,
+        marginBottom: effectiveGapY,
+        marginRight: isLastInRow ? 0 : effectiveGapX,
+      };
+    }
 
     return {
       width: calculatedWidth,

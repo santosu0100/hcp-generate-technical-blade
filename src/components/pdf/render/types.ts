@@ -16,6 +16,8 @@ import type {
   TableConfig,
   ChartConfig,
   ChartData,
+  ImageViewConfig,
+  ImageViewData,
   LabelValueDataDTO,
   BigIntDataDTO,
   ActionButtonDataDTO,
@@ -30,11 +32,11 @@ import type {
   MarkerListData,
   TableData,
   LabelValueVariant,
-} from '../../../types/components.dto';
+} from '@/types/components.dto';
 
 export const ComponentCategory = {
-  LAYOUT: 'LAYOUT',
-  COMPONENTS: 'COMPONENTS',
+  LAYOUT: 'Layout',
+  COMPONENTS: 'Componentes',
 } as const;
 
 export type ComponentCategory = (typeof ComponentCategory)[keyof typeof ComponentCategory];
@@ -45,12 +47,16 @@ export type ComponentCategory = (typeof ComponentCategory)[keyof typeof Componen
 
 export type RenderChildFn = (child: BaseComponentDTO) => ReactElement | null;
 
+// Note: ComponentRendererContext is defined in ComponentRenderer.tsx
+// and imported from there when needed
+
 export interface BaseRendererProps {
   config?: unknown;
   data?: unknown;
   children?: BaseComponentDTO[];
   theme?: ComponentTheme;
   renderChild: RenderChildFn;
+  context?: { originator?: string };
 }
 
 export type ComponentRendererFn = (props: BaseRendererProps) => ReactElement | null;
@@ -61,9 +67,11 @@ export type ComponentRendererFn = (props: BaseRendererProps) => ReactElement | n
 
 export interface BrandRendererProps {
   config?: BrandConfig;
+  context?: { originator?: string };
 }
 
 export interface CardRendererProps {
+  config?: { width?: number | string; height?: number | string };
   children?: BaseComponentDTO[];
   renderChild: RenderChildFn;
   theme?: ComponentTheme;
@@ -121,6 +129,8 @@ export interface TitleDescriptionRendererProps {
   data?: TitleDescriptionData;
   config?: TitleDescriptionConfig;
   theme?: ComponentTheme;
+  children?: BaseComponentDTO[];
+  renderChild: RenderChildFn;
 }
 
 export interface OrderedDescriptionRendererProps {
@@ -168,5 +178,11 @@ export interface BoxGroupRendererProps {
 export interface ChartRendererProps {
   data?: ChartData;
   config?: ChartConfig;
+  theme?: ComponentTheme;
+}
+
+export interface ImageViewRendererProps {
+  data?: ImageViewData;
+  config?: ImageViewConfig;
   theme?: ComponentTheme;
 }

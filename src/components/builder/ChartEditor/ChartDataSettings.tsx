@@ -235,6 +235,39 @@ export function ChartDataSettings({ data, onUpdate }: ChartDataSettingsProps) {
                         </div>
                       </div>
                     </div>
+
+                    {(ds.type === 'line' || (data as any).type === 'line') && (
+                      <div className="grid grid-cols-3 gap-4 border-t border-white/5 mt-2 pt-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-1">Tensão (Curva)</label>
+                          <input 
+                            type="number" 
+                            step="0.1"
+                            value={ds.tension ?? 0.4} 
+                            onChange={(e) => handleUpdateDataset(dsIndex, { tension: parseFloat(e.target.value) })}
+                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-bold text-slate-500 uppercase tracking-widest pl-1">Raio Ponto</label>
+                          <input 
+                            type="number" 
+                            value={ds.pointRadius ?? 3} 
+                            onChange={(e) => handleUpdateDataset(dsIndex, { pointRadius: parseInt(e.target.value) })}
+                            className="w-full bg-black/20 border border-white/10 rounded-lg px-3 py-2 text-xs text-slate-200 outline-none focus:border-blue-500"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between pt-5">
+                          <span className="text-[9px] font-bold text-slate-500 uppercase">Preencher</span>
+                          <button 
+                            onClick={() => handleUpdateDataset(dsIndex, { fill: !ds.fill })}
+                            className={`w-8 h-4 rounded-full relative transition-all ${ds.fill ? 'bg-indigo-500' : 'bg-slate-700'}`}
+                          >
+                            <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${ds.fill ? 'left-[18px]' : 'left-[2px]'}`} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

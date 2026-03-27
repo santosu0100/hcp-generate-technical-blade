@@ -1,6 +1,6 @@
 import { StyleSheet, View, Image } from '@react-pdf/renderer';
 import React from 'react';
-import { Originator, DEFAULT_ORIGINATOR, getLogoPath } from '@/utils/originators';
+import { Originator, DEFAULT_ORIGINATOR, getLogoPath } from '../../utils/originators';
 
 type Alignment = 'left' | 'right' | 'center';
 
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Brand({ originator = DEFAULT_ORIGINATOR, alignment = 'left' }: BrandProps) {
-  const logoSrc = getLogoPath(originator);
+  const logoSrc = getLogoPath(originator as Originator);
 
   const getAlignmentStyle = () => {
     switch (alignment) {

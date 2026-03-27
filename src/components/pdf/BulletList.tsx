@@ -25,6 +25,8 @@ interface BulletListConfig {
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 interface BulletListProps {
@@ -106,6 +108,8 @@ export default function BulletList({ items, config, textAlign = 'left', theme }:
     config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
     config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
     config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+    config?.width !== undefined ? { width: config.width } : {},
+    config?.height !== undefined ? { height: config.height } : {},
   ];
 
   return (

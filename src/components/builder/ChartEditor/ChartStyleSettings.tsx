@@ -61,9 +61,25 @@ export function ChartStyleSettings({ config, onUpdate }: ChartStyleSettingsProps
 
       {/* Global Style Section */}
       <section className="space-y-4 bg-white/5 p-4 rounded-xl border border-white/5">
-        <h3 className="text-[11px] font-bold text-blue-400 uppercase tracking-widest border-b border-white/5 pb-2 mb-4">Título e Legenda</h3>
+        <h3 className="text-[11px] font-bold text-blue-400 uppercase tracking-widest border-b border-white/5 pb-2 mb-4">Dimensões & Legenda</h3>
         
         <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <PropertyField 
+              label="Largura (%)" 
+              value={config.widthPercent?.replace('%', '')} 
+              onChange={(val) => onUpdate({ ...config, widthPercent: `${val}%` })}
+              type="number"
+              placeholder="100"
+            />
+            <PropertyField 
+              label="Altura (px)" 
+              value={config.displayHeight} 
+              onChange={(val) => onUpdate({ ...config, displayHeight: Number(val) })}
+              type="number"
+              placeholder="200"
+            />
+          </div>
           <PropertyField 
             label="Título do Gráfico" 
             value={options.title} 
@@ -92,12 +108,25 @@ export function ChartStyleSettings({ config, onUpdate }: ChartStyleSettingsProps
               <span className="text-[10px] font-bold text-slate-200 uppercase tracking-wider block">Exibir Legenda</span>
               <span className="text-[9px] text-slate-500 italic">Identificação das séries</span>
             </div>
-            <button 
-              onClick={() => handleUpdateOptions({ legendDisplay: !options.legendDisplay })}
-              className={`w-10 h-5 rounded-full relative transition-all ${options.legendDisplay !== false ? 'bg-blue-500' : 'bg-slate-700'}`}
-            >
-              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${options.legendDisplay !== false ? 'left-[24px]' : 'left-[4px]'}`} />
-            </button>
+            <div className="flex items-center gap-4">
+              {options.legendDisplay !== false && (
+                <div className="w-20">
+                  <PropertyField 
+                    label="Tam. Fonte" 
+                    value={options.legendFontSize} 
+                    onChange={(val) => handleUpdateOptions({ legendFontSize: val as number })}
+                    type="number"
+                    placeholder="11"
+                  />
+                </div>
+              )}
+              <button 
+                onClick={() => handleUpdateOptions({ legendDisplay: !options.legendDisplay })}
+                className={`w-10 h-5 rounded-full relative transition-all ${options.legendDisplay !== false ? 'bg-blue-500' : 'bg-slate-700'}`}
+              >
+                <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${options.legendDisplay !== false ? 'left-[24px]' : 'left-[4px]'}`} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -107,7 +136,23 @@ export function ChartStyleSettings({ config, onUpdate }: ChartStyleSettingsProps
         <h3 className="text-[11px] font-bold text-indigo-400 uppercase tracking-widest border-b border-white/5 pb-2 mb-4">Eixos e Grade</h3>
         
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-x-4">
+          <div className="grid grid-cols-2 gap-4">
+            <PropertyField 
+              label="Tamanho Fonte Eixos" 
+              value={options.tickFontSize} 
+              onChange={(val) => handleUpdateOptions({ tickFontSize: val as number })}
+              type="number"
+              placeholder="10"
+            />
+            <PropertyField 
+              label="Cor da Grade" 
+              value={options.gridColor} 
+              onChange={(val) => handleUpdateOptions({ gridColor: val as string })}
+              type="color"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-x-4 border-t border-white/5 pt-4">
              <div className="flex items-center justify-between py-2">
                 <span className="text-[10px] text-slate-400 uppercase font-bold">Eixo X (Labels)</span>
                 <button 

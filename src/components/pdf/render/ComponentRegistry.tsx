@@ -18,6 +18,7 @@ import MarkerList from '../MarkerList';
 import Table from '../Table';
 import BoxGroup from '../BoxGroup';
 import Chart from '../Chart';
+import ImageView from '../ImageView';
 import type {
   BrandRendererProps,
   CardRendererProps,
@@ -38,14 +39,19 @@ import type {
   TableRendererProps,
   BoxGroupRendererProps,
   ChartRendererProps,
+  ImageViewRendererProps,
 } from './types';
 
 // Render functions for each component - this is the source of truth
 export const componentRenderers = {
-  brand: ({ config }: BrandRendererProps) => <Brand originator={config?.originator} alignment={config?.alignment} />,
+  brand: ({ config, context }: BrandRendererProps) => (
+    <Brand originator={config?.originator ?? context?.originator} alignment={config?.alignment} />
+  ),
 
-  card: ({ children, renderChild, theme }: CardRendererProps) => (
-    <Card theme={theme}>{children?.map(child => renderChild(child))}</Card>
+  card: ({ config, children, renderChild, theme }: CardRendererProps) => (
+    <Card theme={theme} width={config?.width} height={config?.height}>
+      {children?.map(child => renderChild(child))}
+    </Card>
   ),
 
   'label-value': ({ data, config, theme }: LabelValueRendererProps) => (
@@ -77,10 +83,13 @@ export const componentRenderers = {
       itemsPerRow={config?.itemsPerRow}
       gapX={config?.gapX}
       gapY={config?.gapY}
+      equalWidth={config?.equalWidth}
       marginTop={config?.marginTop}
       marginBottom={config?.marginBottom}
       marginLeft={config?.marginLeft}
-      marginRight={config?.marginRight}>
+      marginRight={config?.marginRight}
+      width={config?.width}
+      height={config?.height}>
       {children?.map(child => renderChild(child))}
     </Section>
   ),
@@ -95,14 +104,10 @@ export const componentRenderers = {
     <Link label={data?.label ?? ''} href={data?.href ?? ''} color={config?.color} theme={theme} />
   ),
 
-  'title-description': ({ data, config, theme }: TitleDescriptionRendererProps) => (
-    <TitleDescription
-      title={data?.title ?? ''}
-      description={data?.description ?? ''}
-      links={data?.links}
-      config={config}
-      theme={theme}
-    />
+  'title-description': ({ data, config, theme, children, renderChild }: TitleDescriptionRendererProps) => (
+    <TitleDescription data={data} config={config} theme={theme}>
+      {children?.map(child => renderChild(child))}
+    </TitleDescription>
   ),
 
   'ordered-description': ({ data, config, theme }: OrderedDescriptionRendererProps) => (
@@ -145,11 +150,16 @@ export const componentRenderers = {
       marginTop={config?.marginTop}
       marginBottom={config?.marginBottom}
       marginLeft={config?.marginLeft}
-      marginRight={config?.marginRight}>
+      marginRight={config?.marginRight}
+      width={config?.width}
+      height={config?.height}>
       {children?.map(child => renderChild(child))}
     </BoxGroup>
   ),
 
-  chart: ({ data, config, theme }: ChartRendererProps) => 
-    data && config ? <Chart data={data} config={config} theme={theme} /> : null,
+  chart: ({ data, config, theme }: ChartRendererProps) => <Chart data={data!} config={config!} theme={theme} />,
+
+  'image-view': ({ data, config, theme }: ImageViewRendererProps) => (
+    <ImageView data={data} config={config} theme={theme} />
+  ),
 } as const;

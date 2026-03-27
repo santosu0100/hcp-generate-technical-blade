@@ -8,6 +8,8 @@ interface CardTheme {
 interface CardProps {
   children?: ReactNode;
   theme?: CardTheme;
+  width?: number | string;
+  height?: number | string;
 }
 
 const styles = StyleSheet.create({
@@ -25,8 +27,18 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Card({ children, theme }: CardProps) {
+export default function Card({ children, theme, width, height }: CardProps) {
   const borderColor = theme?.borderColor ?? '#E2E8F0';
 
-  return <View style={[styles.container, { borderColor }]}>{children}</View>;
+  return (
+    <View
+      style={[
+        styles.container,
+        { borderColor },
+        width !== undefined ? { width } : {},
+        height !== undefined ? { height } : {},
+      ]}>
+      {children}
+    </View>
+  );
 }

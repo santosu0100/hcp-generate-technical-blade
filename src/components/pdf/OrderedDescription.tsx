@@ -18,6 +18,7 @@ interface OrderedDescriptionTheme {
   textPrimary?: string;
   textSecondary?: string;
   lineColor?: string;
+  numberColor?: string;
 }
 
 interface OrderedDescriptionConfig {
@@ -36,6 +37,8 @@ interface OrderedDescriptionConfig {
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 interface OrderedDescriptionProps {
@@ -109,7 +112,7 @@ export default function OrderedDescription({ items, config, theme }: OrderedDesc
   const titleFontSize = config?.titleFontSize ?? 8;
   const descriptionFontSize = config?.descriptionFontSize ?? 8;
   const numberFontSize = config?.numberFontSize ?? 7;
-  const numberColor = config?.numberColor ?? '#000000';
+  const numberColor = config?.numberColor ?? theme?.numberColor ?? '#000000';
   const markerGap = config?.markerGap ?? 6;
 
   // Dynamic circle size based on number font size
@@ -121,6 +124,8 @@ export default function OrderedDescription({ items, config, theme }: OrderedDesc
     config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
     config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
     config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+    config?.width !== undefined ? { width: config.width } : {},
+    config?.height !== undefined ? { height: config.height } : {},
   ];
 
   return (

@@ -1,9 +1,9 @@
 import React, { ReactElement } from 'react';
 import { componentRenderers } from './ComponentRegistry';
-import type { BaseComponentDTO } from '@/types/components.dto';
+import type { BaseComponentDTO } from '../../../types/components.dto';
 import type { RenderChildFn } from './types';
-import { resolveComponentTheme } from '@/utils/themes';
-import type { ComponentThemeConfig } from '@/utils/themes';
+import { resolveComponentTheme } from '../../../utils/themes';
+import type { ComponentThemeConfig } from '../../../utils/themes';
 
 export interface ComponentRendererContext {
   originator?: string;
@@ -21,6 +21,7 @@ type RendererFunction = (props: {
   children?: BaseComponentDTO[];
   theme?: ComponentThemeConfig;
   renderChild: RenderChildFn;
+  context?: ComponentRendererContext;
 }) => ReactElement | null;
 
 export function ComponentRenderer({ component, context }: ComponentRendererProps): ReactElement | null {
@@ -49,11 +50,12 @@ export function ComponentRenderer({ component, context }: ComponentRendererProps
     children,
     theme: resolvedTheme,
     renderChild,
+    context,
   });
 }
 
 export function renderComponents(components: BaseComponentDTO[], context: ComponentRendererContext): ReactElement[] {
   return components
     .map((component, index) => <ComponentRenderer key={index} component={component} context={context} />)
-    .filter(Boolean);
+    .filter((comp): comp is ReactElement => comp !== null);
 }

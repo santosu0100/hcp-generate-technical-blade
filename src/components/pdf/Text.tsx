@@ -1,19 +1,23 @@
-import { StyleSheet, Text as PdfText } from '@react-pdf/renderer';
+import { StyleSheet, Text } from '@react-pdf/renderer';
 import React from 'react';
 
 interface TextTheme {
+  primaryColor?: string;
+  textSecondary?: string;
   textPrimary?: string;
 }
 
 interface TextConfig {
-  fontSize?: number;
-  fontWeight?: 'normal' | 'bold';
   color?: string;
-  align?: 'left' | 'right' | 'center' | 'justify';
+  fontSize?: number;
+  fontWeight?: 'normal' | 'bold' | 'semibold';
+  textAlign?: 'left' | 'right' | 'center' | 'justify';
   marginTop?: number;
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 interface TextProps {
@@ -23,23 +27,28 @@ interface TextProps {
 }
 
 const styles = StyleSheet.create({
-  text: {},
+  text: {
+    fontSize: 8,
+    lineHeight: 1.4,
+  },
 });
 
-export default function Text({ content, config, theme }: TextProps) {
-  const textColor = config?.color ?? theme?.textPrimary ?? '#4A4A4A';
+export default function TextComponent({ content, config, theme }: TextProps) {
+  const color = config?.color ?? theme?.textSecondary ?? '#71717A';
   const fontSize = config?.fontSize ?? 8;
   const fontWeight = config?.fontWeight ?? 'normal';
-  const textAlign = config?.align ?? 'left';
+  const textAlign = config?.textAlign ?? 'left';
 
   const textStyle = [
     styles.text,
-    { fontSize, fontWeight, color: textColor, textAlign },
+    { color, fontSize, fontWeight, textAlign },
     config?.marginTop !== undefined ? { marginTop: config.marginTop } : {},
     config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
     config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
     config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
+    config?.width !== undefined ? { width: config.width } : {},
+    config?.height !== undefined ? { height: config.height } : {},
   ];
 
-  return <PdfText style={textStyle}>{content}</PdfText>;
+  return <Text style={textStyle}>{content}</Text>;
 }

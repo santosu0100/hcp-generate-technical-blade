@@ -7,9 +7,16 @@ import {
   ChartData as ChartJSData,
   ChartOptions as ChartJSOptions,
 } from 'chart.js';
+import { createCanvas, CanvasRenderingContext2D } from 'canvas';
 
 // Register all Chart.js components
 ChartJS.register(...registerables);
+
+// Type for Chart.js context in Node.js environment
+interface ChartNodeContext {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+}
 
 // ============================================
 // Types
@@ -102,20 +109,13 @@ const styles = StyleSheet.create({
 const SCALE_FACTOR = 2;
 
 function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: ChartProps['theme']): string {
-  // Browser-safe canvas implementation
-  if (typeof document === 'undefined') return '';
-
   const width = config.width ?? 400;
   const height = config.height ?? 300;
   const options = config.options ?? {};
 
-  // Create high-resolution canvas using browser API
-  const canvas = document.createElement('canvas');
-  canvas.width = width * SCALE_FACTOR;
-  canvas.height = height * SCALE_FACTOR;
+  // Create high-resolution canvas
+  const canvas = createCanvas(width * SCALE_FACTOR, height * SCALE_FACTOR);
   const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-  
   ctx.scale(SCALE_FACTOR, SCALE_FACTOR);
 
   // Colors
@@ -140,11 +140,11 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
 
   // Build datasets with proper configuration
   const datasets: ChartJSData['datasets'] = data.datasets.map((dataset, index) => {
-    const isLine = dataset.type === 'line' || (config.type === 'line' && !dataset.type);
+    const isLine = dataset.type === 'line';
     const defaultColor = index === 0 ? primaryColor : '#1E3A5F';
 
     return {
-      type: (dataset.type ?? config.type) as any,
+      type: dataset.type ?? config.type,
       label: dataset.label,
       data: dataset.data,
       backgroundColor: dataset.backgroundColor ?? defaultColor,
@@ -156,7 +156,7 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
         fill: dataset.fill ?? false,
         tension: dataset.tension ?? 0,
         pointRadius: dataset.pointRadius ?? 4,
-        pointBackgroundColor: (dataset.backgroundColor as string) ?? defaultColor,
+        pointBackgroundColor: dataset.backgroundColor ?? defaultColor,
         pointBorderColor: '#FFFFFF',
         pointBorderWidth: 2,
         borderDash: dataset.borderDash,
@@ -165,7 +165,7 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
       ...(!isLine && {
         borderRadius: 4,
       }),
-    } as any;
+    };
   });
 
   // Build scales configuration
@@ -233,7 +233,7 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
 
   // Build complete Chart.js configuration
   const chartConfig: ChartConfiguration = {
-    type: (config.type === 'line' ? 'line' : 'bar') as any, // Base type, datasets can override
+    type: config.type === 'line' ? 'line' : 'bar', // Base type, datasets can override
     data: {
       labels: data.labels,
       datasets,
@@ -242,7 +242,6 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
       responsive: false,
       maintainAspectRatio: false,
       animation: false,
-      devicePixelRatio: 1, // We handled scaling manually
       plugins: {
         title: {
           display: !!options.title,
@@ -250,19 +249,19 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
           color: options.titleColor ?? textColor,
           font: {
             size: titleFontSize,
-            weight: 'bold' as const,
+            weight: 'bold',
           },
           padding: { bottom: 10 },
         },
         legend: {
           display: options.legendDisplay ?? true,
-          position: 'top' as const,
-          align: 'center' as const,
+          position: 'top',
+          align: 'center',
           labels: {
             color: textColor,
             font: { size: legendFontSize },
             usePointStyle: true,
-            pointStyle: 'circle' as const,
+            pointStyle: 'circle',
             padding: 15,
           },
         },
@@ -271,25 +270,27 @@ function renderChartToBase64(data: ChartData, config: ChartConfig, theme?: Chart
     },
   };
 
-  // Create chart instance
-  const chart = new ChartJS(ctx as any, chartConfig);
-  const base64 = canvas.toDataURL('image/png');
-  chart.destroy();
+  // Create chart
+  const chartNode = {
+    canvas: canvas as unknown as HTMLCanvasElement, // Still need this since canvas package types don't match HTMLCanvasElement perfectly but Chart.js expects it
+    ctx,
+  };
+  new ChartJS(chartNode as any, chartConfig);
 
-  return base64;
+  return canvas.toDataURL('image/png');
 }
 
 export default function Chart({ data, config, theme }: ChartProps) {
-  if (!data || !config) return null;
+  const canvasWidth = config?.width ?? 400;
+  const canvasHeight = config?.height ?? 300;
+  const displayWidth = config?.widthPercent ?? '100%';
+  const displayHeight = config?.displayHeight ?? canvasHeight * 0.75;
 
-  const canvasWidth = config.width ?? 400;
-  const canvasHeight = config.height ?? 300;
-  const displayWidth = config.widthPercent ?? '100%';
-  const displayHeight = config.displayHeight ?? canvasHeight * 0.75;
-
-  const base64Image = renderChartToBase64(data, config, theme);
-
-  if (!base64Image) return <View style={styles.container} />;
+  const base64Image = renderChartToBase64(
+    { ...data, datasets: (data?.datasets)?.map(ds => ({ ...ds, data: ds.data })) },
+    { ...config, width: canvasWidth, height: canvasHeight },
+    theme,
+  );
 
   const containerStyle = [
     styles.container,
@@ -297,7 +298,7 @@ export default function Chart({ data, config, theme }: ChartProps) {
     config?.marginBottom !== undefined ? { marginBottom: config.marginBottom } : {},
     config?.marginLeft !== undefined ? { marginLeft: config.marginLeft } : {},
     config?.marginRight !== undefined ? { marginRight: config.marginRight } : {},
-  ] as any;
+  ];
 
   return (
     <View style={containerStyle}>

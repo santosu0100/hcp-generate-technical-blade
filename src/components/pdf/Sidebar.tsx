@@ -17,6 +17,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Sidebar({ children, width = 126 }: SidebarProps) {
+export default function Sidebar({ children, width = 120 }: SidebarProps) {
   return <View style={[styles.container, { width }]}>{children}</View>;
 }
