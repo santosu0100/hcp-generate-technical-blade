@@ -16,8 +16,10 @@ export function JsonTemplateViewer() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  if (!template) return null;
+
   return (
-    <div className="w-full max-w-4xl flex flex-col gap-4">
+    <div className="w-full max-w-4xl flex flex-col gap-4 animate-in fade-in duration-500">
       <div className="flex justify-between items-center px-2">
         <div className="flex flex-col">
           <span className="text-slate-400 text-sm font-mono italic">// JSON Technical Blade Template</span>
@@ -48,8 +50,10 @@ export function JsonTemplateViewer() {
           )}
         </button>
       </div>
-      <div className="w-full bg-slate-950 p-6 rounded-lg text-blue-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap leading-relaxed border border-slate-800 shadow-inner">
-        <pre>{JSON.stringify(template, null, 2)}</pre>
+      <div className="w-full bg-slate-950 p-6 rounded-lg text-blue-400 font-mono text-sm overflow-x-auto whitespace-pre-wrap leading-relaxed border border-slate-800 shadow-inner group">
+        <pre className="group-hover:text-blue-300 transition-colors">
+          {JSON.stringify(template, null, 2)}
+        </pre>
       </div>
     </div>
   );
