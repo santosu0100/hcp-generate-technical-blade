@@ -156,16 +156,26 @@ function prunePayload(obj: any): any {
       if (key.startsWith('internal_')) continue;
 
       if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
-        if (typeof value === 'object') {
+          if (key === 'config') {
+            const isNonEmptyObject = typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length > 0;
+            if (!isNonEmptyObject) continue;
+            
+            const nested = prunePayload(value);
+            if (typeof nested === 'object' && nested !== null && Object.keys(nested).length > 0) {
+              pruned[key] = nested;
+            }
+            continue;
+          }
+
           const nested = prunePayload(value);
+
           if (Array.isArray(nested)) {
             if (nested.length > 0) pruned[key] = nested;
-          } else if (Object.keys(nested).length > 0) {
+          } else if (typeof nested === 'object' && nested !== null) {
+            if (Object.keys(nested).length > 0) pruned[key] = nested;
+          } else {
             pruned[key] = nested;
           }
-        } else {
-          pruned[key] = value;
-        }
       }
     }
     return pruned;

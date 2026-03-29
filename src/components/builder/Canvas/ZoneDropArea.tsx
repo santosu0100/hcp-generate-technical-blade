@@ -27,7 +27,7 @@ export function ZoneDropArea({ onDropType, currentNodes, title, className = '', 
     try {
       const data = JSON.parse(e.dataTransfer.getData('application/json'));
       if (data.isNew && data.type && onDropType(data.type)) {
-        addComponent(data.type, parentId, initialConfig);
+        addComponent(data.type, parentId, undefined, initialConfig);
       } else if (data.id) {
         reorderComponent(data.id, parentId);
       }

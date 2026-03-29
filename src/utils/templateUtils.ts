@@ -28,7 +28,7 @@ const shouldTemplatePath = (path: string): boolean => {
   const parts = path.split('.');
   const lastPart = parts[parts.length - 1];
   
-  // Exceções: rótulos, títulos e definições de colunas são mantidos como valores reais
+  // Exceções: rótulos e títulos são mantidos como valores reais para o PDF
   if (['label', 'title'].includes(lastPart)) return false;
   if (path.includes('.columns.')) return false;
 
@@ -52,13 +52,19 @@ export function prunePayload(obj: any, keepInternal = false): any {
     if (value === '' || value === undefined || value === null) return acc;
     if (typeof value === 'number' && Number.isNaN(value)) return acc;
 
-    if (typeof value !== 'object') {
+    if (typeof value !== 'object' || value === null) {
+      if (key === 'config') return acc;
       return { ...acc, [key]: value };
     }
 
     const nested = prunePayload(value, keepInternal);
-    const hasItems = Array.isArray(nested) ? nested.length > 0 : Object.keys(nested).length > 0;
     
+    if (key === 'config') {
+      const isNonEmptyObject = typeof nested === 'object' && nested !== null && !Array.isArray(nested) && Object.keys(nested).length > 0;
+      return isNonEmptyObject ? { ...acc, [key]: nested } : acc;
+    }
+
+    const hasItems = Array.isArray(nested) ? nested.length > 0 : (typeof nested === 'object' && nested !== null ? Object.keys(nested).length > 0 : true);
     return hasItems ? { ...acc, [key]: nested } : acc;
   }, {});
 }
@@ -70,9 +76,10 @@ function replaceWithPool(obj: any, actualPath: string, templatePath: string, ski
   if (skipPaths.includes(actualPath)) return obj;
 
   if (Array.isArray(obj)) {
-    return obj.map((item, index) => 
-      replaceWithPool(item, `${actualPath}.${index}`, `${templatePath}.${index}`, skipPaths)
-    );
+    return obj.map((item, index) => {
+      const res = replaceWithPool(item, `${actualPath}.${index}`, `${templatePath}.${index}`, skipPaths);
+      return (res && typeof res === 'object' && '__templateKey' in res) ? res.__templateKey : res;
+    });
   }
 
   if (obj !== null && typeof obj === 'object') {
@@ -86,23 +93,48 @@ function replaceWithPool(obj: any, actualPath: string, templatePath: string, ski
       ...skipPaths
     ];
 
-    return Object.entries(obj).reduce((acc, [key, value]) => {
+    const defaultValues: { key: string; value: any }[] = [];
+
+    const processedObj = Object.entries(obj).reduce((acc, [key, value]) => {
       if (key === 'internal_templateKey') return acc;
 
       const nextActualPath = actualPath === '' ? key : `${actualPath}.${key}`;
       const nextTemplatePath = templatePath === '' ? key : `${templatePath}.${key}`;
       
+      const result = replaceWithPool(value, nextActualPath, nextTemplatePath, activeSkipPaths);
+
+      // Se o resultado for uma marcação de template com valor original, coleta para o array
+      if (result && typeof result === 'object' && '__templateKey' in result) {
+        defaultValues.push({ key: result.__templateKey, value: result.__originalValue });
+        return {
+          ...acc,
+          [key]: result.__templateKey
+        };
+      }
+
       return {
         ...acc,
-        [key]: replaceWithPool(value, nextActualPath, nextTemplatePath, activeSkipPaths)
+        [key]: result
       };
     }, baseObj);
+
+    // Se houve substituições, adiciona o atributo literal keyDefaultValue
+    if (defaultValues.length > 0) {
+      (processedObj as any).keyDefaultValue = defaultValues;
+    }
+
+    return processedObj;
   }
 
   // Valor primitivo: verifica se deve virar uma chave de template
-  return isTemplateableValue(obj) && shouldTemplatePath(actualPath)
-    ? generateKey(templatePath)
-    : obj;
+  if (isTemplateableValue(obj) && shouldTemplatePath(actualPath)) {
+    return {
+      __templateKey: generateKey(templatePath),
+      __originalValue: obj
+    };
+  }
+
+  return obj;
 }
 
 /**
