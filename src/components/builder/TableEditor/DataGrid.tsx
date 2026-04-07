@@ -34,6 +34,14 @@ export function DataGrid({ columns, items, setItems }: DataGridProps) {
     setItems(newItems);
   };
 
+  const updateCellMetadata = (rowIndex: number, colKey: string, changes: any) => {
+    const newItems = [...items];
+    const cellMetadata = { ...(newItems[rowIndex].cellMetadata || {}) };
+    cellMetadata[colKey] = { ...(cellMetadata[colKey] || {}), ...changes };
+    newItems[rowIndex] = { ...newItems[rowIndex], cellMetadata };
+    setItems(newItems);
+  };
+
   return (
     <div className="space-y-6 animate-in slide-in-from-right-4 duration-300 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4 shrink-0">
@@ -96,6 +104,13 @@ export function DataGrid({ columns, items, setItems }: DataGridProps) {
                         <td className="p-2 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button 
+                              onClick={() => updateRowStyle(rIdx, '_editingMetadata', !row.style?._editingMetadata)}
+                              className={`p-2 rounded transition-colors ${row.style?._editingMetadata ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500 hover:text-slate-300'}`}
+                              title="Configurar Metadados das Células"
+                            >
+                              <Palette size={16} />
+                            </button>
+                            <button 
                               onClick={() => updateRowStyle(rIdx, '_editingStyle', !row.style?._editingStyle)}
                               className={`p-2 rounded transition-colors ${row.style?._editingStyle ? 'text-blue-400 bg-blue-500/10' : 'text-slate-500 hover:text-slate-300'}`}
                               title="Estilo da Linha"
@@ -111,6 +126,39 @@ export function DataGrid({ columns, items, setItems }: DataGridProps) {
                           </div>
                         </td>
                       </tr>
+                      {row.style?._editingMetadata && (
+                        <tr className="bg-amber-500/5 border-x border-amber-500/20">
+                          <td colSpan={columns.length + 2} className="px-12 py-4">
+                            <h4 className="text-[10px] font-bold text-amber-500 uppercase mb-3">Metadados por Célula (Template)</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              {columns.map(col => (
+                                <div key={col.key} className="space-y-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                                  <div className="text-[10px] font-bold text-slate-400 uppercase">{col.label}</div>
+                                  <input 
+                                    type="text"
+                                    placeholder="Origin Data Key"
+                                    value={row.cellMetadata?.[col.key]?.originDataKey || ''}
+                                    onChange={(e) => updateCellMetadata(rIdx, col.key, { originDataKey: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded px-2 py-1 text-xs text-white outline-none focus:border-amber-500"
+                                  />
+                                  <div className="flex items-center gap-2 mt-1">
+                                    <input 
+                                      type="checkbox"
+                                      id={`literal-${rIdx}-${col.key}`}
+                                      checked={row.cellMetadata?.[col.key]?.internal_showLiteralValue ?? false}
+                                      onChange={(e) => updateCellMetadata(rIdx, col.key, { internal_showLiteralValue: e.target.checked })}
+                                      className="w-3 h-3 accent-amber-500"
+                                    />
+                                    <label htmlFor={`literal-${rIdx}-${col.key}`} className="text-[9px] text-slate-400 cursor-pointer">
+                                      Valor Literal (Sem {"{{ }}"})
+                                    </label>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
                       {row.style?._editingStyle && (
                         <tr className="bg-blue-500/5 border-x border-blue-500/20">
                           <td colSpan={columns.length + 2} className="px-12 py-3">

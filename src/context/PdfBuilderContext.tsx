@@ -146,42 +146,7 @@ function buildWrappedTree(components: any[]): WrappedComponent[] {
   });
 }
 
-function prunePayload(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(item => (typeof item === 'object' && item !== null) ? prunePayload(item) : item);
-  }
-  if (obj !== null && typeof obj === 'object') {
-    const pruned: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.startsWith('internal_')) continue;
-
-      if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
-          if (key === 'config') {
-            const isNonEmptyObject = typeof value === 'object' && value !== null && !Array.isArray(value) && Object.keys(value).length > 0;
-            if (!isNonEmptyObject) continue;
-            
-            const nested = prunePayload(value);
-            if (typeof nested === 'object' && nested !== null && Object.keys(nested).length > 0) {
-              pruned[key] = nested;
-            }
-            continue;
-          }
-
-          const nested = prunePayload(value);
-
-          if (Array.isArray(nested)) {
-            if (nested.length > 0) pruned[key] = nested;
-          } else if (typeof nested === 'object' && nested !== null) {
-            if (Object.keys(nested).length > 0) pruned[key] = nested;
-          } else {
-            pruned[key] = nested;
-          }
-      }
-    }
-    return pruned;
-  }
-  return obj;
-}
+import { prunePayload } from '../utils/templateUtils';
 
 function extractDtoExt(nodes: WrappedComponent[]): ComponentDTO[] {
   return nodes.map(n => {
@@ -191,7 +156,8 @@ function extractDtoExt(nodes: WrappedComponent[]): ComponentDTO[] {
     } else {
       delete rawDto.children;
     }
-    return prunePayload(rawDto) as ComponentDTO;
+    // Para persistência e preview, mantemos os campos internal_
+    return prunePayload(rawDto, true) as ComponentDTO;
   });
 }
 

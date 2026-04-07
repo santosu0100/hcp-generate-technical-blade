@@ -25,25 +25,16 @@ export function SidebarRight() {
 
   const component = selectedComponentId ? findComponent(rootComponents, selectedComponentId) : null;
 
-  const pruneObject = (obj: any) => {
-    return Object.entries(obj).reduce((acc: any, [key, value]) => {
-      if (value !== '' && value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {});
-  };
-
   const updateData = (newData: any) => {
     if (!component) return;
     const merged = { ...(component.dto.data || {}), ...newData };
-    updateComponent(component.id, { data: pruneObject(merged) });
+    updateComponent(component.id, { data: merged });
   };
 
   const updateConfig = (newConfig: any) => {
     if (!component) return;
     const merged = { ...(component.dto.config || {}), ...newConfig };
-    updateComponent(component.id, { config: pruneObject(merged) });
+    updateComponent(component.id, { config: merged });
   };
 
   if (!component) {

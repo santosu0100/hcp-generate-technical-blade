@@ -186,6 +186,7 @@ export interface ImageViewTheme {
 export interface TableColumnConfig {
   key: string;
   label: string;
+  originDataKey?: string;
   width?: number | string;
   style?: {
     backgroundColor?: string;
@@ -211,6 +212,7 @@ export interface TableGroupConfig {
 
 export interface TableRowData {
   cells: Record<string, string | number>;
+  cellMetadata?: Record<string, { originDataKey?: string; internal_showLiteralValue?: boolean }>;
   style?: { backgroundColor?: string; textColor?: string; bold?: boolean; italic?: boolean };
 }
 
@@ -319,6 +321,10 @@ export interface BaseComponentDTO {
   config?: ComponentConfigDTO;
   data?: ComponentDataDTO;
   children?: BaseComponentDTO[];
+  internal_originDataKey?: string;
+  internal_isTemplateModel?: boolean;
+  internal_showLiteralValue?: boolean;
+  internal_itemRemap?: Record<string, string>;
 }
 
 // ============================================
@@ -547,6 +553,7 @@ export interface TableColumnStyleDTO {
 export interface TableColumnDTO {
   key: string;
   label: string;
+  originDataKey?: string;
   width?: number | string;
   style?: TableColumnStyleDTO;
   bold?: boolean;
@@ -563,7 +570,8 @@ export interface TableRowStyleDTO {
 }
 
 export interface TableRowDTO {
-  [key: string]: string | number | TableRowStyleDTO | undefined;
+  cells: Record<string, string | number>;
+  cellMetadata?: Record<string, { originDataKey?: string; internal_showLiteralValue?: boolean }>;
   style?: TableRowStyleDTO;
 }
 

@@ -102,6 +102,16 @@ export function ColumnManager({ columns, setColumns }: ColumnManagerProps) {
                   <option value="right" className="bg-slate-800">Direita</option>
                 </select>
               </div>
+              <div className="flex-1 space-y-2">
+                <label className="text-[10px] font-bold text-slate-500 uppercase">Origin Data Key</label>
+                <input 
+                  type="text" 
+                  value={col.originDataKey || ''}
+                  onChange={(e) => updateColumn(idx, 'originDataKey', e.target.value)}
+                  placeholder="ID no Template"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm outline-none focus:border-blue-500"
+                />
+              </div>
               <button 
                 onClick={() => removeColumn(idx)}
                 className="p-2.5 text-slate-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"

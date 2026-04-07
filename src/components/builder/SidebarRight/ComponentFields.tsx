@@ -63,7 +63,7 @@ export function ComponentFields({
     if (['action-button', 'link'].includes(type)) return <LinkFields {...props} />;
     if (type === 'section') return <SectionFields {...props} />;
     if (type === 'title-description') return <TitleDescriptionFields data={data} onUpdateData={onUpdateData} />;
-    if (['bullet-list', 'ordered-list', 'marker-list', 'arrow-list'].includes(type)) return <ListFields type={type} data={data} onUpdateData={onUpdateData} />;
+    if (['bullet-list', 'ordered-list', 'marker-list', 'arrow-list', 'ordered-description'].includes(type)) return <ListFields type={type} data={data} onUpdateData={onUpdateData} />;
     if (type === 'table' && onOpenTableEditor) return <TableConfigFields config={config} onUpdateConfig={onUpdateConfig} onOpenTableEditor={onOpenTableEditor} />;
     if (type === 'box-group') return <BoxGroupFields config={config} onUpdateConfig={onUpdateConfig} />;
     if (type === 'image-view') return <ImageViewFields {...props} />;
